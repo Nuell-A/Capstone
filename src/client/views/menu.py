@@ -10,7 +10,7 @@ class MenuView:
         self.manager = manager
         self.createUI(WIDTH, HEIGHT)
 
-    def createUI(self, WIDTH, HEIGHT):
+    def createUI(self):
         '''Creating and positiong UI elements. Rects are used for positioning relative to
         other elements. '''
         # Buttons
