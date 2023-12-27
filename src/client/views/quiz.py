@@ -31,16 +31,20 @@ class QuizView:
                                                          starting_height=1,
                                                          container=None,
                                                          anchors={'centerx': 'centerx', 'top_target': self.question_textbox})
+        answers = {}
         for i in range(4):
             button_rect = button_size.copy()
             button_rect.x = -10 + (1200/4 * i) # Button spacing
             button_rect.y = -3
+            button_id = f"button{i}"
             self.answer_choice = pygame_gui.elements.UIButton(relative_rect=button_rect,
                                                          text=f"Answer choice number {i}",
                                                          manager=self.manager,
                                                          container=self.answerchoice_panel,
                                                          )
-        
+            
+            answers[button_id] = self.answer_choice
+            
         # Live score bar
         self.score_bar = pygame_gui.elements.UIProgressBar(relative_rect=pygame.Rect((0, 50), (1200, 50)),
                                                       manager=self.manager,
