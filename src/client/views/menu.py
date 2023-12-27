@@ -8,7 +8,7 @@ class MenuView:
         
         self.screen = screen
         self.manager = manager
-        self.createUI(WIDTH, HEIGHT)
+        self.createUI()
 
     def createUI(self):
         '''Creating and positiong UI elements. Rects are used for positioning relative to
@@ -46,14 +46,13 @@ class MenuView:
 
     def handleEvents(self, event):
         '''Checks for specific events and acts accordingly.'''
-        for event in pygame.event.get():
-            if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == self.host_bt:
-                    print("Hosting session...")
-            
-            if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == self.join_bt:
-                    print("Joining session...")
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == self.host_bt:
+                print("Hosting session...")
+        
+        if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == self.join_bt:
+                print("Joining session...")
 
         self.manager.process_events(event)
 

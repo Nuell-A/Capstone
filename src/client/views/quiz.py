@@ -4,14 +4,17 @@ import pygame_gui
 SCREEN = (1280, 720)
 
 class QuizView:
-    '''Live quiz view elements.'''
+    '''Method displays the UI, controls events and the timer.'''
 
     def __init__(self, manager, window):
         self.manager = manager
         self.window = window
+        self.timer_duration = 45 # Round duration
+        self.start_time = pygame.time.get_ticks() # Timer control
         self.createUI()
 
     def createUI(self):
+        '''Creates label, question, answer choices, and the score bar.'''
         # Timer
         self.timer_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 20), (50, 50)), text="45",
                                                   manager=self.manager,
@@ -31,7 +34,7 @@ class QuizView:
                                                          starting_height=1,
                                                          container=None,
                                                          anchors={'centerx': 'centerx', 'top_target': self.question_textbox})
-        answers = {}
+        self.answers = {}
         for i in range(4):
             button_rect = button_size.copy()
             button_rect.x = -10 + (1200/4 * i) # Button spacing
@@ -43,29 +46,44 @@ class QuizView:
                                                          container=self.answerchoice_panel,
                                                          )
             
-            answers[button_id] = self.answer_choice
+            self.answers[button_id] = self.answer_choice
             
         # Live score bar
         self.score_bar = pygame_gui.elements.UIProgressBar(relative_rect=pygame.Rect((0, 50), (1200, 50)),
                                                       manager=self.manager,
                                                       container=None,
                                                       anchors={'centerx': 'centerx', 'top_target': self.answerchoice_panel})
+        
+    def updateTimer(self):
+        '''Method to control timer and check if has reached 0.'''
+        # Calculate current time elapsed.
+        current_time = pygame.time.get_ticks()
+        elapsed_time = (current_time - self.start_time) / 1000 # Converts from milliseconds to seconds.
+
+        # Remaining time.
+        remaining_time = max(self.timer_duration - elapsed_time, 0)
+        self.timer_label.set_text(str(int(remaining_time)))
+
+        # Checks if timer is done
+        if remaining_time <= 0:
+            self.timerDone()
+
+    def timerDone(self):
+        '''Will have more in the future.'''
+        print("Ding ding ding ding...")
 
     def handleEvents(self, event):
-        for event in pygame.event.get():
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == self.choice1:
-                    print("Answer choice 1 selected.")
-                if event.ui_element == self.choice2:
-                    print("Answer choice 2 selected.")
-                if event.ui_element == self.choice3:
-                    print("Answer choice 3 selected.")
-                if event.ui_element == self.choice4:
-                    print("Answer choice 4 selected.")
-            
-        self.manager.process_events(event)
+                for button_id, button in self.answers.items():
+                    if event.ui_element == button:
+                        print(f"1Answer choice {button_id} selected.")
+                        break
+                
+            self.manager.process_events(event)
 
     def update(self, dt):
+        '''Updates components that need to be updated.'''
+        self.updateTimer()
         self.manager.update(dt)
 
     def draw(self):
