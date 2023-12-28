@@ -18,7 +18,7 @@ class MenuView:
         self.createUI()
 
     def createUI(self):
-        """Creating and positiong UI elements. Rects are used for positioning relative to
+        """Creating and position UI elements. Rects are used for positioning relative to
         other elements. """
         # Buttons
         host_rect = pygame.Rect((0, 200), (100, 50))
@@ -78,8 +78,6 @@ class MenuView:
 def main():
     running = True
     clock = pygame.time.Clock()  # Controls FPS and tracks time.
-    # dt = delta
-    dt = 0
 
     pygame.init()
     pygame.display.set_caption("Menu")
