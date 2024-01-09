@@ -9,6 +9,7 @@ import config
 
 # Initiate connection
 class Database:
+    '''This class handles the connection to the database.'''
 
     def __init__(self):
         # Database details
