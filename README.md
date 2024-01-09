@@ -19,3 +19,42 @@ My final project I decided to challenge myself with one that included technologi
 ### Purpose
 The goal of this information system is to offer an alternative, but also interactive/engaging method to be incorporated in training programs. Although, this system could be used for a variety of things such as education. 
 This system offers a platform that encourages user interaction and brings out their competitive side, but in a lighthearted manner while also offering some great educational opportunities.
+
+
+### File Structure
+Captstone/
+│
+├── src/
+│   ├── client/
+│   │   ├── assets/                 # Store graphical assets like images, fonts, etc.
+│   │   ├── controllers/            # Logic for handling user inputs and events
+│   │   ├── views/                  # User interface files for different screens
+│   │   │   ├── menu.py             # Menu screen
+│   │   │   ├── quiz.py             # Quiz screen
+│   │   │   └── scoreboard.py       # Scoreboard screen
+│   │   ├── models/                 # Classes representing data structures
+│   │   └── utils/                  # Utility functions and constants
+│   │       ├── constants.py        # Constants like colors, dimensions, etc.
+│   │       └── helpers.py          # Helper functions
+│   │
+│   └── server/
+│       ├── database/               # Database related files
+│       │   ├── models.py           # ORM models or database schemas
+│       │   └── db_connection.py    # Database connection setup
+│       ├── controllers/            # Server logic to handle requests
+│       │   ├── quiz_controller.py  # Handles quiz-related requests
+│       │   └── user_controller.py  # Handles user-related requests
+│       ├── utils/                  # Utility functions for server
+│       └── server.py               # Main server script
+│
+├── tests/                          # Unit tests and integration tests
+│   ├── client_tests/
+│   └── server_tests/
+│
+├── config.py						# Configuration for SQL database and other sensitive information
+│
+├── venv/                           # Virtual environment
+│
+├── .gitignore                      # Specifies intentionally untracked files to ignore
+├── requirements.txt                # List of dependencies for the project
+└── README.md                       # Project overview and instructions

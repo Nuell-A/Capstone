@@ -22,25 +22,21 @@ class Database:
 
         self.c = None
 
-        self.startConnection(self.config)
+        self.startConnection()
     
-    def startConnection(self, config):
+    def startConnection(self):
+        print("Connecting to database...")
         try:
-            self.c = mysql.connector.connect(**config)
-            print("Connection successful.")
+            self.c = mysql.connector.connect(**self.config)
+            print("Connection successful.\n")
         except mysql.connector.Error as e:
-            print(f"Error: {e}.")
+            print(f"Error: {e}.\n")
 
     def closeConnection(self):
+        print("Closing database...")
         try:
             self.c.close()
-            print("Connection closed successfully.")
+            print("Connection closed successfully.\n")
         except:
-            print("There was an error when closing database connection.")
+            print("There was an error when closing database connection.\n")
 
-    def showAnswersTable(self, cursor):
-        query = "SELECT * FROM answers"
-        cursor.execute(query)
-
-        for row in cursor:
-            print(row)
