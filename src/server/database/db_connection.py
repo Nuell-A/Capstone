@@ -28,7 +28,9 @@ class Database:
     def startConnection(self):
         print("Connecting to database...")
         try:
-            self.c = mysql.connector.connect(**self.config)
+            with mysql.connector.connect(**self.config) as conn:
+                self.c = conn
+                
             print("Connection successful.\n")
         except mysql.connector.Error as e:
             print(f"Error: {e}.\n")

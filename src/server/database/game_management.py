@@ -22,6 +22,8 @@ class GameManagement:
             print(row)
         print("")
 
+        cursor.close()
+
     def close(self):
         self.db.closeConnection()
 
@@ -40,8 +42,10 @@ class GameManagement:
 
             print(game_id)
             print("Game successfully hosted, please share the Game ID with other players.")
+            cursor.close()
         except:
             print("There was an error hosting your game.")
+            cursor.close()
 
     def uniqueGameID(self):
         '''Creates unique ID with random module.'''
@@ -69,4 +73,5 @@ class GameManagement:
         questions = cursor.fetchall() # Gets all values from 
 
         print("Questions set created")
+        cursor.close()
         return questions
