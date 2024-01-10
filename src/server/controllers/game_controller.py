@@ -11,4 +11,6 @@ between the incoming requests from clients to ther server.'''
 
 db = Database()
 gm = GameManagement(db)
+gm.showAnswersTable
 questions = gm.getQuestions(1)
+print(questions)

@@ -54,7 +54,8 @@ class GameManagement:
         return game_id
     
     def getQuestions(self, size: int):
-        '''Creates question set from database. 'size' is the number of questions for the question set.'''
+        '''Creates question set from database. 'size' is the number of questions for the question set.
+        QuestionsTable: question_id, game_id, question_text, correct_answer'''
 
         questions = []
         cursor = self.db.c.cursor()
@@ -63,7 +64,9 @@ class GameManagement:
 
         query = "SELECT * FROM questions ORDER BY RAND() LIMIT %s"
         cursor.execute(query, (size,))
-        questions = cursor.fetchall()
+        '''fetchall() returns a list of tuples where each tuple is a row.
+          e.g. [(row1), (row2), etc.]'''
+        questions = cursor.fetchall() # Gets all values from 
 
         print("Questions set created")
         return questions
