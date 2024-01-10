@@ -7,7 +7,7 @@ WIDTH, HEIGHT = 1280, 720
 class MenuView:
     """Handles all functions related to the Menu view."""
 
-    def __init__(self, screen, manager):
+    def __init__(self, screen, manager, width: int, height: int):
 
         self.username_text = None
         self.title_label = None
@@ -15,6 +15,8 @@ class MenuView:
         self.host_bt = None
         self.screen = screen
         self.manager = manager
+        self.width = width
+        self.height = height
         self.createUI()
 
     def createUI(self):
@@ -67,39 +69,9 @@ class MenuView:
         self.manager.update(dt)
 
     def draw(self):
-        background = pygame.Surface((WIDTH, HEIGHT))
+        background = pygame.Surface((self.width, self.height))
         background.fill(pygame.Color('#a575c6'))
 
         # blit is used to add a surface to the screen.
         self.screen.blit(background, (0, 0))
         self.manager.draw_ui(self.screen)
-
-
-def main():
-    running = True
-    clock = pygame.time.Clock()  # Controls FPS and tracks time.
-
-    pygame.init()
-    pygame.display.set_caption("Menu")
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    manager = pygame_gui.UIManager((WIDTH, HEIGHT))
-
-    menu_view = MenuView(screen, manager)
-
-    while running:
-        dt = clock.tick(30) / 1000  # Limited to 30 FPS
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            menu_view.handleEvents(event)
-
-        menu_view.update(dt)
-        menu_view.draw()
-        pygame.display.update()  # Updates the whole screen (if no argument is passed).
-
-    pygame.quit()
-
-
-if __name__ == "__main__":
-    main()
