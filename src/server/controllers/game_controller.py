@@ -1,7 +1,7 @@
 import sys
 
-sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
-
+sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src") # Mac
+sys.path.insert(2, "C:\\Users\\alcal\\Documents\\Projects\\Capstone\\Capstone\\src") # Windows
 from server.database.game_management import GameManagement
 from server.database.db_connection import Database
 

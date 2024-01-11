@@ -3,7 +3,8 @@ import pygame
 import pygame_gui
 
 import sys
-sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
+sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src") # Mac
+sys.path.insert(2, "C:\\Users\\alcal\\Documents\\Projects\\Capstone\\Capstone\\src") # Windows
 import config
 from client.views.menu import MenuView
 from client.views.quiz import QuizView
