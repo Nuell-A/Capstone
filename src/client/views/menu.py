@@ -1,13 +1,11 @@
 import pygame
 import pygame_gui
 
-WIDTH, HEIGHT = 1280, 720
-
 
 class MenuView:
     """Handles all functions related to the Menu view."""
 
-    def __init__(self, screen, manager, width: int, height: int):
+    def __init__(self, screen, manager, screen_size: tuple):
 
         self.username_text = None
         self.title_label = None
@@ -15,8 +13,7 @@ class MenuView:
         self.host_bt = None
         self.screen = screen
         self.manager = manager
-        self.width = width
-        self.height = height
+        self.screen_size = screen_size
         self.createUI()
 
     def createUI(self):
@@ -40,7 +37,7 @@ class MenuView:
                                                              'top_target': self.host_bt})
         # TextBox
         self.title_label = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 50), (150, 100)),
-                                                         html_text='<h1><effect id=title>GAME TITLE</effect></h1>',
+                                                         html_text='<effect id=title>GAME TITLE</effect>',
                                                          manager=self.manager,
                                                          container=None,
                                                          anchors={'centerx': 'centerx'})
@@ -55,6 +52,7 @@ class MenuView:
 
     def handleEvents(self, event):
         """Checks for specific events and acts accordingly."""
+        print("checking events")
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == self.host_bt:
                 print("Hosting session...")
@@ -69,7 +67,7 @@ class MenuView:
         self.manager.update(dt)
 
     def draw(self):
-        background = pygame.Surface((self.width, self.height))
+        background = pygame.Surface(self.screen_size)
         background.fill(pygame.Color('#a575c6'))
 
         # blit is used to add a surface to the screen.

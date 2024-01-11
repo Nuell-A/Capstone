@@ -1,14 +1,15 @@
 import pygame
 import pygame_gui
 
-SCREEN = (1280, 720)
+
 
 class QuizView:
     '''Method displays the UI, controls events and the timer.'''
 
-    def __init__(self, manager, window):
+    def __init__(self, screen, manager, screen_size: tuple):
+        self.screen = screen
         self.manager = manager
-        self.window = window
+        self.screen_size = screen_size
         self.timer_duration = 45 # Round duration
         self.start_time = pygame.time.get_ticks() # Timer control
         self.createUI()
@@ -87,25 +88,26 @@ class QuizView:
         self.manager.update(dt)
 
     def draw(self):
-        background = pygame.Surface(SCREEN)
+        background = pygame.Surface(self.screen_size)
         background.fill(pygame.Color('#a575c6'))
 
         # blit is used to add a surface to the screen.
-        self.window.blit(background, (0, 0))
-        self.manager.draw_ui(self.window)
+        self.screen.blit(background, (0, 0))
+        self.manager.draw_ui(self.screen_size)
 
+'''
 def main():
-    '''Main loop.'''
+    ''Main loop.''
     running = True
     clock = pygame.time.Clock()
     dt = 0
 
     pygame.init()
     pygame.display.set_caption("Game Session")
-    window = pygame.display.set_mode(SCREEN)
-    manager = pygame_gui.UIManager(SCREEN)
+    screen = pygame.display.set_mode(self.screen_size)
+    manager = pygame_gui.UIManager(self.screen_size)
 
-    quiz_view = QuizView(manager, window)
+    quiz_view = QuizView(screen, manager)
 
     while running:
         dt = clock.tick(30)/1000
@@ -124,3 +126,4 @@ def main():
 
 if __name__=="__main__":
     main()
+'''
