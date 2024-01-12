@@ -8,6 +8,7 @@ sys.path.insert(2, "C:\\Users\\alcal\\Documents\\Projects\\Capstone\\Capstone\\s
 import config
 from client.views.menu import MenuView
 from client.views.quiz import QuizView
+
 '''
 # Using with statment means that we do not have to close the socket,
 # . it closes on its own.
@@ -24,53 +25,37 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         print(receive)
 '''
 
-screen_size = (1280, 720)
-running = True
-clock = pygame.time.Clock() # Controls FPS & tracks time.
+def gameLoop():
+    active_scene = "menu" # default
+    screen_size = (1280, 720)
+    clock = pygame.time.Clock() # Controls FPS & tracks time.
+    dt = clock.tick(60) / 1000
+    pygame.init()
+    screen = pygame.display.set_mode(screen_size)
+    pygame.display.set_caption("Menu")
+    manager = pygame_gui.UIManager(screen_size)
 
-pygame.init()
-screen = pygame.display.set_mode(screen_size)
-pygame.display.set_caption("Menu")
-manager = pygame_gui.UIManager(screen_size)
-
-menu_view = MenuView(screen, manager, screen_size)
-quiz_view = QuizView(screen, manager, screen_size)
-
-current_state = "menu" # Default view is the menu
-
-while running:
-    dt = clock.tick(30) / 1000 # Liimits to 30 fps
+    menu_view = MenuView(screen, manager, screen_size, dt)
+    quiz_view = QuizView(screen, manager, screen_size, dt)
 
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    while True:
+        
+        if active_scene == "menu":
+            menu_view.sceneLoop()
+            print("finished menu")
+            active_scene = menu_view.scene
 
-        if current_state == "menu":
-            menu_view.handleEvents(event)
+        if active_scene == "quiz":
+            quiz_view.sceneLoop()
 
-        elif current_state == "hosting":
-            print("host state")
-        elif current_state == "joining":
-            print("joing state")
-        elif current_state == "quiz":
-            print("quiz state")
-            quiz_view.createUI()
-            quiz_view.handleEvents(event)
+        if menu_view.scene or quiz_view.scene == "quit":
+            break
 
-    if current_state == "menu":
-        menu_view.update(dt)
-        menu_view.draw()
-    elif current_state == "hosting":
-        pass
-    elif current_state == "joining":
-        pass
-    elif current_state == "quiz":
-        pass
+    pygame.quit
+    sys.exit()
 
-    pygame.display.update() # Updates whole screen (if no argument is passed).
-
-pygame.quit
+gameLoop()
 
 '''Issue deciding where to place createUI(). If it's placed in if statment, then the program starts choking
 and doesn't register inputs. If it's placed in the constructor, then all views are generated and displayed

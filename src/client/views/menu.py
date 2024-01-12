@@ -5,16 +5,14 @@ import pygame_gui
 class MenuView:
     """Handles all functions related to the Menu view."""
 
-    def __init__(self, screen, manager, screen_size: tuple):
-
-        self.username_text = None
-        self.title_label = None
-        self.join_bt = None
-        self.host_bt = None
+    def __init__(self, screen, manager, screen_size: tuple, dt):
+        self.scene = None
+        self.dt = dt
+        self.running = True
         self.screen = screen
         self.manager = manager
         self.screen_size = screen_size
-        self.createUI()
+        print("running sceneloop")
 
     def createUI(self):
         """Creating and position UI elements. Rects are used for positioning relative to
@@ -49,22 +47,40 @@ class MenuView:
                                                                 container=None,
                                                                 anchors={'centerx': 'centerx',
                                                                          'top_target': self.join_bt})
+        
+    def killUI(self):
+        self.host_bt.kill()
+        self.join_bt.kill()
+        self.title_label.kill()
+        self.username_text.kill()
 
-    def handleEvents(self, event):
+    def handleEvents(self):
         """Checks for specific events and acts accordingly."""
-        print("checking events")
-        if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_element == self.host_bt:
-                print("Hosting session...")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                print("quitting")
+                self.scene = "quit"
+                return "quit"
+            
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == self.host_bt:
+                    print("Hosting session...")
+                    self.scene = "quiz"
+                    return "quiz"
 
-        if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_element == self.join_bt:
-                print("Joining session...")
+                elif event.ui_element == self.join_bt:
+                    print("Joining session...")
 
-        self.manager.process_events(event)
+            self.manager.process_events(event)
 
-    def update(self, dt):
-        self.manager.update(dt)
+        return "menu"
+
+    def update(self):
+        # Will only execute after every 5 frames to limit text effect on game title. 
+        if self.frame_counter % 5 == 0:
+            self.manager.update(self.dt)
+        
+        self.frame_counter += 1
 
     def draw(self):
         background = pygame.Surface(self.screen_size)
@@ -73,3 +89,24 @@ class MenuView:
         # blit is used to add a surface to the screen.
         self.screen.blit(background, (0, 0))
         self.manager.draw_ui(self.screen)
+
+    def sceneLoop(self):
+        self.frame_counter = 0 # Initialized to keep track of frames
+        self.running = True
+        print("creating UI")
+        self.createUI()
+
+        while self.running:
+            self.dt
+            self.running = self.handleEvents()
+
+            if self.running == "quit":
+                return "quit"
+            
+            if self.running == "quiz":
+                self.killUI()
+                return
+            
+            self.update()
+            self.draw()
+            pygame.display.update()

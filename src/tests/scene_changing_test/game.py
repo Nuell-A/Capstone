@@ -25,12 +25,13 @@ def gameLoop():
         if active_scene == "menu":
             menu_view.sceneLoop()
             print("finished menu")
+            active_scene = menu_view.scene
 
         time.sleep(2)
-        if menu_view.scene == "quiz":
+        if active_scene == "quiz":
             quiz_view.sceneLoop()
 
-        if active_scene == active_scene:
+        if menu_view.scene or quiz_view.scene == "quit":
             break
 
     pygame.quit

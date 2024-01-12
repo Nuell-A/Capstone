@@ -6,13 +6,15 @@ import pygame_gui
 class QuizView:
     '''Method displays the UI, controls events and the timer.'''
 
-    def __init__(self, screen, manager, screen_size: tuple):
+    def __init__(self, screen, manager, screen_size: tuple, dt):
+        self.scene = None
+        self.running = True
         self.screen = screen
         self.manager = manager
         self.screen_size = screen_size
+        self.dt = dt
         self.timer_duration = 45 # Round duration
-        self.start_time = pygame.time.get_ticks() # Timer control
-        self.createUI()
+        self.start_time = None # timer control
 
     def createUI(self):
         '''Creates label, question, answer choices, and the score bar.'''
@@ -72,20 +74,31 @@ class QuizView:
     def timerDone(self):
         '''Will have more in the future.'''
         print("Ding ding ding ding...")
+        # Implement next question and answers combo
+        # Reset timer
 
-    def handleEvents(self, event):
-            if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                for button_id, button in self.answers.items():
-                    if event.ui_element == button:
-                        print(f"1Answer choice {button_id} selected.")
-                        break
+    def handleEvents(self):
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    print("quitting")
+                    return "quit"
                 
-            self.manager.process_events(event)
+                if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                    for button_id, button in self.answers.items():
+                        if event.ui_element == button:
+                            # Implement switchcase or if-elif blocks for each button_id and check if choice is correct/wrong
+                            print(f"1Answer choice {button_id} selected.")
+                        
+                    
+                self.manager.process_events(event)
+            
+            return True
 
-    def update(self, dt):
+
+    def update(self):
         '''Updates components that need to be updated.'''
         self.updateTimer()
-        self.manager.update(dt)
+        self.manager.update(self.dt)
 
     def draw(self):
         background = pygame.Surface(self.screen_size)
@@ -93,37 +106,26 @@ class QuizView:
 
         # blit is used to add a surface to the screen.
         self.screen.blit(background, (0, 0))
-        self.manager.draw_ui(self.screen_size)
+        self.manager.draw_ui(self.screen)
 
-'''
-def main():
-    ''Main loop.''
-    running = True
-    clock = pygame.time.Clock()
-    dt = 0
+    def sceneLoop(self):
+        self.running = True
+        print("creating UI quiz")
+        self.createUI()
+        self.start_time = pygame.time.get_ticks() # Initiates timer upon scene creation.
 
-    pygame.init()
-    pygame.display.set_caption("Game Session")
-    screen = pygame.display.set_mode(self.screen_size)
-    manager = pygame_gui.UIManager(self.screen_size)
+        while self.running:
+            self.dt
+            self.running = self.handleEvents()
+            if self.running == "quit":
+                return "quit"
+            
+            if self.running == "quiz": # Temp
+                self.killUI()
+                print("killed ui")
+                return
+            
+            self.update()
+            self.draw()
 
-    quiz_view = QuizView(screen, manager)
-
-    while running:
-        dt = clock.tick(30)/1000
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            quiz_view.handleEvents(event)
-
-        quiz_view.update(dt)
-        quiz_view.draw()
-        pygame.display.update()
-
-    pygame.quit()
-
-if __name__=="__main__":
-    main()
-'''
+            pygame.display.update()
