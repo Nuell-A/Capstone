@@ -1,0 +1,62 @@
+'''This is for controlling scenes in the game.'''
+
+
+
+
+def createUI():
+    # creates UI components
+
+def handleEvents():
+    for event in events:
+        if event == QUIT:
+            # quitting
+        if event == "host_bt":
+            # logic to switch to host screen
+        elif event == "join_bt":
+            # logic to switch to host screen
+        elif event == "quiz_bt":
+            # logic to switch to host screen
+            return "quiz"
+
+
+def quizView():
+    dt = (fps control - pygame)
+    createUI()
+    running = true
+
+    while running:
+        handleEvents()
+
+        quiz.update(dt)
+        quiz.draw()
+
+        pygame.update()
+
+def menuView():
+    dt = (fps control - pygame)
+    createUI() # important that it's outside the loop
+    running = true
+
+    while running:
+        handleEvents()
+
+        menu.update(dt)
+        menu.draw()
+
+        pygame.update()
+
+
+def gameLoop():
+    # default scene at startup
+    active_scene = "menu"
+
+    while True:
+        if active_scene == "menu":
+            active_scene = menuView() # self-contained scene 
+        elif active_scene == "quiz":
+            active_scene = quizView()
+        else: 
+            break
+
+    pygame.quit
+    sys.exit()
