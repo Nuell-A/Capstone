@@ -30,19 +30,21 @@ class GameManagement:
     def hostGame(self):
         '''Creates unique game id, and inserts new row into quiz_sessions table.'''
 
-        print("Starting hostint process...")
+        print("Starting hosting process...")
         try:
             cursor = self.db.c.cursor()
             game_id = self.uniqueGameID()
             host_user = 'test'
             is_active = 1 # is_active: 1 for true, 0 for false.
-
+            # Future, check if game_id is already active in database with a query.
             query = "INSERT INTO quiz_sessions(game_id, host_user, is_active) VALUES(%s, %s, %s)"
             cursor.execute(query, (game_id, host_user, is_active))
 
             print(game_id)
             print("Game successfully hosted, please share the Game ID with other players.")
             cursor.close()
+
+            return game_id
         except:
             print("There was an error hosting your game.")
             cursor.close()
