@@ -34,28 +34,30 @@ Example:
 
 def socketStart():
     print("Starting socket...")
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
         s.bind((config.socket_host, config.socket_port))
         s.listen()
-        print("Awaiting client connection")
+        print("Socket binded successfully.")
         # Once accept is called it blocks script execution, hence while threading is needed.
+    except:
+        print("There was an error starting the socket.")
+        s.close()
+    
+    
+    print("Ready to accept clients:")
+    while True:
         conn, addr = s.accept() # conn = new socket object, addr = client address 
-
         print(f"Client connected: {addr}")
-        while conn:
-            while True:
-                message = conn.recv(1024)
-                if not message:
-                    break
-                conn.sendall(message)
 
-def testFunction():
-    for x in range(1, 15):
-        print(x)
-        time.sleep(2)
+        request = conn.recv(1024).decode("utf-8")
 
-socket_listen = threading.Thread(target=socketStart)
-socket_listen.start()
+        if request == "hosting":
+            pass
 
-test = threading.Thread(target=testFunction)
-test.start()
+
+    """socket_listen = threading.Thread(target=socketStart)
+    socket_listen.start()
+
+    test = threading.Thread(target=testFunction)
+    test.start()"""
