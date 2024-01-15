@@ -4,11 +4,33 @@ import sys
 import time
 
 sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
+sys.path.insert(2, "C:\\Users\\alcal\\Documents\\Projects\\Capstone\\Capstone\\src") # Windows
 
 import config
 
 
-'''This file will handle the hosting of the server on the itnernet.'''
+'''This file will handle the hosting of the server on the itnernet.
+
+JSON communication protocol:
+types - request_question_set, question_set | join_session, join_session_response | unique_id, unique_id_response
+
+Example:
+{
+    "type": "request_question_set,
+    "data": {
+        "questions": [
+            {
+                "text": "question",
+                "options": ["answer1", "answer2", "answer3", "answer4"],
+                "correct_option": "answer2"
+            },
+            {
+                "text": "question2",
+                // Fill in the rest.
+            }
+        ]
+    },
+}'''
 
 def socketStart():
     print("Starting socket...")
