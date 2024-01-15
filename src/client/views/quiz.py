@@ -1,18 +1,14 @@
 import pygame
 import pygame_gui
+from .base_view import BaseView
 
 
 
-class QuizView:
+class QuizView(BaseView):
     '''Method displays the UI, controls events and the timer.'''
 
     def __init__(self, screen, manager, screen_size: tuple, dt):
-        self.scene = None
-        self.running = True
-        self.screen = screen
-        self.manager = manager
-        self.screen_size = screen_size
-        self.dt = dt
+        super().__init__(screen, manager, screen_size, dt)
         self.timer_duration = 45 # Round duration
         self.start_time = None # timer control
 
@@ -99,14 +95,6 @@ class QuizView:
         '''Updates components that need to be updated.'''
         self.updateTimer()
         self.manager.update(self.dt)
-
-    def draw(self):
-        background = pygame.Surface(self.screen_size)
-        background.fill(pygame.Color('#a575c6'))
-
-        # blit is used to add a surface to the screen.
-        self.screen.blit(background, (0, 0))
-        self.manager.draw_ui(self.screen)
 
     def sceneLoop(self):
         self.running = True

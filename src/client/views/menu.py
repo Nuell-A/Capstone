@@ -1,17 +1,13 @@
 import pygame
 import pygame_gui
+from .base_view import BaseView
 
 
-class MenuView:
+class MenuView(BaseView):
     """Handles all functions related to the Menu view."""
 
     def __init__(self, screen, manager, screen_size: tuple, dt):
-        self.scene = None
-        self.dt = dt
-        self.running = True
-        self.screen = screen
-        self.manager = manager
-        self.screen_size = screen_size
+        super().__init__(screen, manager, screen_size, dt)
         print("running sceneloop")
 
     def createUI(self):
@@ -81,14 +77,6 @@ class MenuView:
             self.manager.update(self.dt)
         
         self.frame_counter += 1
-
-    def draw(self):
-        background = pygame.Surface(self.screen_size)
-        background.fill(pygame.Color('#a575c6'))
-
-        # blit is used to add a surface to the screen.
-        self.screen.blit(background, (0, 0))
-        self.manager.draw_ui(self.screen)
 
     def sceneLoop(self):
         self.frame_counter = 0 # Initialized to keep track of frames
