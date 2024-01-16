@@ -77,6 +77,7 @@ class QuizView(BaseView):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     print("quitting")
+                    self.scene = "quit"
                     return "quit"
                 
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
@@ -106,7 +107,7 @@ class QuizView(BaseView):
             self.dt
             self.running = self.handleEvents()
             if self.running == "quit":
-                return "quit"
+                 return "quit"
             
             if self.running == "quiz": # Temp
                 self.killUI()

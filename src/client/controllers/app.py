@@ -8,6 +8,7 @@ sys.path.insert(2, "C:\\Users\\alcal\\Documents\\Projects\\Capstone\\Capstone\\s
 import config
 from client.views.menu import MenuView
 from client.views.quiz import QuizView
+from client.views.host import HostView
 
 '''
 # Using with statment means that we do not have to close the socket,
@@ -37,6 +38,7 @@ def gameLoop():
 
     menu_view = MenuView(screen, manager, screen_size, dt)
     quiz_view = QuizView(screen, manager, screen_size, dt)
+    host_view = HostView(screen, manager, screen_size, dt)
 
 
     while True:
@@ -48,8 +50,13 @@ def gameLoop():
 
         if active_scene == "quiz":
             quiz_view.sceneLoop()
+            active_scene = quiz_view.scene
 
-        if menu_view.scene or quiz_view.scene == "quit":
+        if active_scene == "host":
+            host_view.sceneLoop()
+            active_scene = host_view.scene
+
+        if active_scene == "quit":
             break
 
     pygame.quit

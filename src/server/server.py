@@ -1,12 +1,12 @@
 import socket
 import threading
-import sys
-import time
+import json
 
+import sys
 sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
 sys.path.insert(2, "C:\\Users\\alcal\\Documents\\Projects\\Capstone\\Capstone\\src") # Windows
-
 import config
+
 
 
 '''This file will handle the hosting of the server on the itnernet.
@@ -32,9 +32,52 @@ Example:
     },
 }'''
 
-def socketStart():
+def handleClient(conn):
+    try:
+        while True:
+            data = conn.recv(1024)
+
+            if not data: # Checks for client connection
+                break
+            
+            request = json.loads(data.decode('utf-8')) # Load JSON file (request)
+            request_type = request.get('type', '') # .get(key, default_value)
+            # Below is handling of requests with threads.
+            if request_type == "request_question_set":
+                response = getQuestionSet()
+                return response
+
+            elif request_type == "join_session":
+                response = checkJoinSession()
+                return response
+
+            elif request_type == "unique_id":
+                response = getUniqueID()
+                return response
+            
+    except Exception as e:
+        print(f"There was an error handling the client: {e}")
+
+    finally:
+        conn.close() # Always closes socket connection
+
+def getQuestionSet():
+    '''Gets questions from database and returns question set in JSON format.'''
+
+    return "Question set delivered"
+
+def getUniqueID():
+    '''Gets uniqueID and returns it in JSON format.'''
+    return "Unique ID delivered"
+
+def checkJoinSession():
+    '''Takes game ID from request and checks it against database (if it exists).
+    Returns approve or denied (if not exists)'''
+    return "Joined session"
+
+def main():
     print("Starting socket...")
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IPV4 and TCP
     try:
         s.bind((config.socket_host, config.socket_port))
         s.listen()
@@ -50,14 +93,6 @@ def socketStart():
         conn, addr = s.accept() # conn = new socket object, addr = client address 
         print(f"Client connected: {addr}")
 
-        request = conn.recv(1024).decode("utf-8")
-
-        if request == "hosting":
-            pass
-
-
-    """socket_listen = threading.Thread(target=socketStart)
-    socket_listen.start()
-
-    test = threading.Thread(target=testFunction)
-    test.start()"""
+        client_handler = threading.Thread(target=handleClient, args=(conn, ))
+        client_handler.start()
+        

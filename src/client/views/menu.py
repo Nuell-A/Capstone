@@ -61,15 +61,15 @@ class MenuView(BaseView):
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.host_bt:
                     print("Hosting session...")
-                    self.scene = "quiz"
-                    return "quiz"
+                    self.scene = "host"
+                    return "host"
 
                 elif event.ui_element == self.join_bt:
                     print("Joining session...")
 
             self.manager.process_events(event)
 
-        return "menu"
+        return True
 
     def update(self):
         # Will only execute after every 5 frames to limit text effect on game title. 
@@ -91,9 +91,9 @@ class MenuView(BaseView):
             if self.running == "quit":
                 return "quit"
             
-            if self.running == "quiz":
+            if self.running == "host":
                 self.killUI()
-                return
+                return "host"
             
             self.update()
             self.draw()
