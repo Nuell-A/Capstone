@@ -1,6 +1,7 @@
 import socket
 import threading
 import json
+import random
 
 import sys
 sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
@@ -32,43 +33,47 @@ Example:
     },
 }'''
 
-def handleClient(conn):
+def handleClient(conn, addr):
     try:
+        print(f"handling client: {addr}")
         while True:
-            data = conn.recv(1024)
-
-            if not data: # Checks for client connection
+            data = conn.recv(2048)
+            
+            if not data:
                 break
             
-            request = json.loads(data.decode('utf-8')) # Load JSON file (request)
-            request_type = request.get('type', '') # .get(key, default_value)
-            # Below is handling of requests with threads.
-            if request_type == "request_question_set":
-                response = getQuestionSet()
-                return response
+            request = data.decode('utf-8')
 
-            elif request_type == "join_session":
-                response = checkJoinSession()
-                return response
+            print("Received data: " + request)
 
-            elif request_type == "unique_id":
-                response = getUniqueID()
-                return response
-            
-    except Exception as e:
-        print(f"There was an error handling the client: {e}")
-
-    finally:
-        conn.close() # Always closes socket connection
+            conn.sendall("message received".encode('utf-8'))
+    except:
+        print("Closing connection.")
+        return
+    
+    print("Client disconnected: " + str(addr))
 
 def getQuestionSet():
     '''Gets questions from database and returns question set in JSON format.'''
 
     return "Question set delivered"
 
-def getUniqueID():
+def getUniqueID(request):
     '''Gets uniqueID and returns it in JSON format.'''
-    return "Unique ID delivered"
+
+    print("Creating Unique ID:")
+    game_id = ""
+    x = random.randint(100000, 999999)
+    game_id = str(x)
+
+    response = {
+        'type': 'uniqueID_response',
+        'data': [{
+            'uniqueID': game_id
+        }]
+    }
+
+    return response
 
 def checkJoinSession():
     '''Takes game ID from request and checks it against database (if it exists).
@@ -83,16 +88,19 @@ def main():
         s.listen()
         print("Socket binded successfully.")
         # Once accept is called it blocks script execution, hence while threading is needed.
-    except:
-        print("There was an error starting the socket.")
-        s.close()
     
     
-    print("Ready to accept clients:")
-    while True:
-        conn, addr = s.accept() # conn = new socket object, addr = client address 
-        print(f"Client connected: {addr}")
+    
+        print("Ready to accept clients:")
+        while True:
+            conn, addr = s.accept() # conn = new socket object, addr = client address 
+            print(f"Client connected: {addr}")
 
-        client_handler = threading.Thread(target=handleClient, args=(conn, ))
-        client_handler.start()
-        
+            client_handler = threading.Thread(target=handleClient, args=(conn, addr))
+            client_handler.start()
+    except KeyboardInterrupt:
+        print("Stopped socket.")
+        s.close()  
+
+if __name__=="__main__":
+    main()

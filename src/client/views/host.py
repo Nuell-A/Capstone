@@ -5,9 +5,10 @@ from .base_view import BaseView
 
 class HostView(BaseView):
 
-    def __init__(self, screen, manager, screen_size, dt):
+    def __init__(self, screen, manager, screen_size, dt, network_handler: object):
         super().__init__(screen, manager, screen_size, dt)
         self.gameID = 100010 # Default/testing value
+        self.network_handler = network_handler
 
     def createUI(self):
         self.gameID_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 35), (150, 50)),
@@ -44,7 +45,15 @@ class HostView(BaseView):
 
         return True
     
+    def getUniqueID(self):
+        "Requests uniqueID from server"
+        request = "uniqueID - request"
+        print("requesting unique ID")
+
+        self.network_handler.sendRequest(request)
+    
     def sceneLoop(self):
+        self.gameID = self.getUniqueID()
         self.running = True
         print("creating UI")
         self.createUI()

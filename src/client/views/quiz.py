@@ -7,10 +7,11 @@ from .base_view import BaseView
 class QuizView(BaseView):
     '''Method displays the UI, controls events and the timer.'''
 
-    def __init__(self, screen, manager, screen_size: tuple, dt):
+    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
         super().__init__(screen, manager, screen_size, dt)
         self.timer_duration = 45 # Round duration
-        self.start_time = None # timer control
+        self.start_time = None # timer controla
+        self.network_handler = network_handler
 
     def createUI(self):
         '''Creates label, question, answer choices, and the score bar.'''

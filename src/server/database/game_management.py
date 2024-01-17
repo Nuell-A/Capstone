@@ -47,17 +47,7 @@ class GameManagement:
             return game_id
         except:
             print("There was an error hosting your game.")
-            cursor.close()
-
-    def uniqueGameID(self):
-        '''Creates unique ID with random module.'''
-
-        print("Creating Unique ID:")
-        game_id = ""
-        x = random.randint(100000, 999999)
-        game_id = str(x)
-
-        return game_id
+            cursor.close()    
     
     def getQuestions(self, size: int):
         '''Creates question set from database. 'size' is the number of questions for the question set.

@@ -6,8 +6,9 @@ from .base_view import BaseView
 class MenuView(BaseView):
     """Handles all functions related to the Menu view."""
 
-    def __init__(self, screen, manager, screen_size: tuple, dt):
+    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
         super().__init__(screen, manager, screen_size, dt)
+        self.network_handler = network_handler
         print("running sceneloop")
 
     def createUI(self):
