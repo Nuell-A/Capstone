@@ -27,6 +27,21 @@ class GameManagement:
     def close(self):
         self.db.closeConnection()
 
+    def getUniqueID():
+        '''Gets uniqueID and returns it in JSON format.'''
+        game_id = ""
+        x = random.randint(100000, 999999)
+        game_id = str(x)
+
+        response = {
+            'type': 'uniqueID_response',
+            'data': [{
+                'uniqueID': game_id
+            }]
+        }
+
+        return response
+
     def hostGame(self):
         '''Creates unique game id, and inserts new row into quiz_sessions table.'''
 

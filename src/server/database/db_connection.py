@@ -42,4 +42,3 @@ class Database:
             print("Connection closed successfully.\n")
         except:
             print("There was an error when closing database connection.\n")
-

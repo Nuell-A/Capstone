@@ -20,6 +20,29 @@ My final project I decided to challenge myself with one that included technologi
 The goal of this information system is to offer an alternative, but also interactive/engaging method to be incorporated in training programs. Although, this system could be used for a variety of things such as education. 
 This system offers a platform that encourages user interaction and brings out their competitive side, but in a lighthearted manner while also offering some great educational opportunities.
 
+### JSON Structure
+The server and client communicate through JSON objects passed back and forth providing information for the request and sending back a response. Below is  an example of the structure of each request/resposne.
+
+JSON communication protocol:
+types - request_question_set, question_set | join_session, join_session_response | unique_id, unique_id_response
+
+Example:
+{
+    "type": "request_question_set,
+    "data": {
+        "questions": [
+            {
+                "text": "question",
+                "options": ["answer1", "answer2", "answer3", "answer4"],
+                "correct_option": "answer2"
+            },
+            {
+                "text": "question2",
+                // Fill in the rest.
+            }
+        ]
+    },
+}
 
 ### File Structure
 Captstone/
