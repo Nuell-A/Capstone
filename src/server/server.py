@@ -43,8 +43,9 @@ def handleClient(conn, addr):
                 break
             
             request = data.decode('utf-8')
+            request_load = json.loads(request)
 
-            print("Received data: " + request)
+            print(f"Received data: {request_load}")
 
             conn.sendall("message received".encode('utf-8'))
     except:

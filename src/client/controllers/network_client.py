@@ -28,7 +28,9 @@ class NetworkClient:
 
     def sendRequest(self, request):
         print("request going to server")
-        self.s.sendall(request.encode('utf-8'))
+        request_dump = json.dumps(request)
+        
+        self.s.sendall(request_dump.encode('utf-8'))
 
 
 

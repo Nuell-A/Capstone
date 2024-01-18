@@ -47,7 +47,7 @@ class HostView(BaseView):
     
     def getUniqueID(self):
         "Requests uniqueID from server"
-        request = "uniqueID - request"
+        request = {'type': 'uniqueID'}
         print("requesting unique ID")
 
         self.network_handler.sendRequest(request)
