@@ -43,7 +43,11 @@ class NetworkClient:
                     break
 
                 response = data.decode()
-                print(f"Received response: {response}")
+                response_object = json.loads(response)
+                print(f"Received response: {response_object}")
+
+                if response_object['type'] == "uniqueID_response":
+                    print(response_object['data', 'uniqueID'])
             except:
                 print("Error receiving data")
                 break
