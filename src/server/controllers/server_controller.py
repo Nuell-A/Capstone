@@ -25,41 +25,39 @@ class ServerController:
         response_json = json.dumps(response)
 
         conn.sendall(response_json.encode('utf-8'))
-        print("Sent response")
+        print("Sent RESPONSE.")
+        
+    def processRequest(self, request, conn):
+        if request['type'] == "uniqueID":
+            print("Creating unique ID....")
+
+            response = self.gm.getUniqueID()    
+            self.sendResponse(conn, response)
+
+        elif request['type'] == "question_set":
+            print("Getting question set...")
+
+            response = self.gm.getQuestions(5)
+            self.sendResponse(conn, response)
 
     def handleClient(self, conn, addr):
         try:
-            print(f"handling client: {addr}")
+            print(f"Handling client: {addr}")
             while True:
-                data = conn.recv(1024)
+                data = conn.recv(1024).decode('utf-8')
                 
                 if not data:
                     break
-                
-                request = data.decode('utf-8')
-                request_load = json.loads(request)
-
-                print(f"Received data: {request_load}")
-
-                if request_load['type'] == "uniqueID":
-                    print("Creating unique ID....")
-
-                    response = self.gm.getUniqueID()    
-                    self.sendResponse(conn, response)
-
-                conn.sendall("message received".encode('utf-8'))
+                print("REQUEST Recieved")
+                request = json.loads(data)
+                self.processRequest(request, conn)
         except:
             logging.error("Error sending message", exc_info=True)
             print("Closing connection.")
             return
         
         print("Client disconnected: " + str(addr))
-
-    def getQuestionSet(self):
-        '''Gets questions from database and returns question set in JSON format.'''
-
-        return "Question set delivered"
-
+    
     def checkJoinSession(self):
         '''Takes game ID from request and checks it against database (if it exists).
         Returns approve or denied (if not exists)'''

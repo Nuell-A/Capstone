@@ -92,6 +92,12 @@ class QuizView(BaseView):
             
             return True
 
+    def getQuestionSet(self):
+        "Requests uniqueID from server"
+        request = {'type': 'question_set'}
+        print("Requesting question set: QUIZ")
+
+        self.network_handler.sendRequest(request)
 
     def update(self):
         '''Updates components that need to be updated.'''
@@ -100,6 +106,7 @@ class QuizView(BaseView):
 
     def sceneLoop(self):
         self.running = True
+        self.getQuestionSet()
         print("creating UI quiz")
         self.createUI()
         self.start_time = pygame.time.get_ticks() # Initiates timer upon scene creation.

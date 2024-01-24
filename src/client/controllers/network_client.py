@@ -15,6 +15,7 @@ class NetworkClient:
         self.host = config.socket_host
         self.port = config.socket_port
         self.s = None
+        self.callback = None
         self.connect()
 
     def connect(self):
@@ -29,40 +30,34 @@ class NetworkClient:
             print("There was an error connecting")
 
     def sendRequest(self, request):
-        print("request going to server")
+        print("REQUEST sent.")
         request_dump = json.dumps(request)
         
         self.s.sendall(request_dump.encode('utf-8'))
 
-
+    def processResponse(self, response):
+        try:
+            if response['type'] == "uniqueID_response":
+                            print(response['data'][0]['uniqueID'])
+            elif response['type'] == "question_set_response":
+                            print(response['data'][0]['questions'])
+        except:
+              print("There was an error processing the response.")
+              logging.error("PROCESSING RESPONSE ERROR: ", exc_info=True)
 
     def handleResponse(self):
         while True:
-            
             try:
                 data = self.s.recv(1024).decode('utf-8')
-
+                
                 if not data:
                     break
-                
-                response = data
-                try:
-                    response = json.loads(data)
-                    print(f"Received response: {response}")
-                except:
-                    logging.error("Error loading JSON", exc_info=True)
 
-                print(f"{response}")
-                try:
-                    "Incase there is not message received"
-                    if response['type'] == "uniqueID_response":
-                        print(response['data'][0]['uniqueID'])
-                except:
-                    print("No response received yet.")
+                response  = json.loads(data)
+                print("RESPONSE received.")
+                self.processResponse(response)
             except:
-                logging.error("There was an error receiving the message", exc_info=True)
-                print("Error receiving data")
+                print("There was an error receiving data.")
+                logging.error("RECEVING ERROR: ", exc_info=True)
+                self.s.close()
                 break
-
-    def testPrint(self):
-        print("Object istantiated")

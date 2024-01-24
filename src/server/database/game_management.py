@@ -7,6 +7,20 @@ class GameManagement:
     def __init__(self, db):
         self.db = db
 
+    def showQuestionsTable(self):
+        cursor = self.db.c.cursor()
+
+        print("Questions Table:")
+        query = "SELECT * FROM questions"
+        cursor.execute(query)
+
+        print("question_id, game_id, question_text, correct_answer")
+        for row in cursor:
+            print(row)
+        print("")
+
+        cursor.close()
+
     def showAnswersTable(self):
         '''Gets data from answers table'''
 
@@ -18,7 +32,7 @@ class GameManagement:
         cursor.execute(query)
 
         print ("answer_id, question_id, answer_text")
-        for row in self.cursor:
+        for row in cursor:
             print(row)
         print("")
 
@@ -37,8 +51,8 @@ class GameManagement:
         response = {
             'type': 'uniqueID_response',
             'data': [{
-                'uniqueID': game_id
-            }]
+                'uniqueID': game_id,
+            },],
         }
 
         return response
@@ -82,4 +96,11 @@ class GameManagement:
 
         print("Questions set created")
         cursor.close()
-        return questions
+
+        response = {
+            'type': 'question_set_response',
+            'data': [{
+                'questions': questions,
+                },],
+        }
+        return response
