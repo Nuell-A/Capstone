@@ -15,7 +15,8 @@ class NetworkClient:
         self.host = config.socket_host
         self.port = config.socket_port
         self.s = None
-        self.callback = None
+        self.game_id = None
+        self.question_set = None
         self.connect()
 
     def connect(self):
@@ -39,7 +40,9 @@ class NetworkClient:
         try:
             if response['type'] == "uniqueID_response":
                             print(response['data'][0]['uniqueID'])
+                            self.game_id = response
             elif response['type'] == "question_set_response":
+                            self.question_set = response
                             print(response['data'][0]['questions'])
         except:
               print("There was an error processing the response.")

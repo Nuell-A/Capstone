@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 from .base_view import BaseView
+import time
 
 
 
@@ -12,6 +13,7 @@ class QuizView(BaseView):
         self.timer_duration = 45 # Round duration
         self.start_time = None # timer controla
         self.network_handler = network_handler
+        self.questions = None
 
     def createUI(self):
         '''Creates label, question, answer choices, and the score bar.'''
@@ -22,7 +24,7 @@ class QuizView(BaseView):
                                                   anchors={'centerx': 'centerx'}
                                                   )
         # Question box
-        self.question_textbox = pygame_gui.elements.UITextBox(html_text='<p>Questions will go here, understand?</p>', 
+        self.question_textbox = pygame_gui.elements.UITextBox(html_text=self.questions[0][2], 
                                                          relative_rect=pygame.Rect((0, 50), (300, 100),),
                                                          manager=self.manager,
                                                          container=None,
@@ -98,6 +100,9 @@ class QuizView(BaseView):
         print("Requesting question set: QUIZ")
 
         self.network_handler.sendRequest(request)
+        time.sleep(.3)
+        # List within list [[q_id, g_id, quesiton, answer], [q_id, g_id, quesiton, answer]]
+        self.questions = self.network_handler.question_set
 
     def update(self):
         '''Updates components that need to be updated.'''
@@ -107,6 +112,7 @@ class QuizView(BaseView):
     def sceneLoop(self):
         self.running = True
         self.getQuestionSet()
+        print(self.questions)
         print("creating UI quiz")
         self.createUI()
         self.start_time = pygame.time.get_ticks() # Initiates timer upon scene creation.

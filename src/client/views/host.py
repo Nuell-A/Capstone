@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 from .base_view import BaseView
+import time
 
 
 class HostView(BaseView):
@@ -49,14 +50,17 @@ class HostView(BaseView):
         "Requests uniqueID from server"
         request = {'type': 'uniqueID'}
         print("Requesting unique ID: HOST")
-
         self.network_handler.sendRequest(request)
+        time.sleep(.3)
+
+        self.gameID = self.network_handler.game_id['data'][0]['uniqueID']
     
     def sceneLoop(self):
-        self.gameID = self.getUniqueID()
+        self.getUniqueID()
         self.running = True
         print("creating UI")
         self.createUI()
+
 
         while self.running:
             self.dt
