@@ -1,6 +1,7 @@
 import socket
 import json
 import threading
+import logging
 
 import sys
 sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
@@ -10,6 +11,7 @@ import config
 class NetworkClient:
 
     def __init__(self):
+        logging.basicConfig(filename="network_client.log", level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
         self.host = config.socket_host
         self.port = config.socket_port
         self.s = None
@@ -36,19 +38,29 @@ class NetworkClient:
 
     def handleResponse(self):
         while True:
+            
             try:
-                data = self.s.recv(2048)
+                data = self.s.recv(1024).decode('utf-8')
 
                 if not data:
                     break
+                
+                response = data
+                try:
+                    response = json.loads(data)
+                    print(f"Received response: {response}")
+                except:
+                    logging.error("Error loading JSON", exc_info=True)
 
-                response = data.decode()
-                response_object = json.loads(response)
-                print(f"Received response: {response_object}")
-
-                if response_object['type'] == "uniqueID_response":
-                    print(response_object['data', 'uniqueID'])
+                print(f"{response}")
+                try:
+                    "Incase there is not message received"
+                    if response['type'] == "uniqueID_response":
+                        print(response['data'][0]['uniqueID'])
+                except:
+                    print("No response received yet.")
             except:
+                logging.error("There was an error receiving the message", exc_info=True)
                 print("Error receiving data")
                 break
 

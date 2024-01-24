@@ -1,7 +1,7 @@
 import socket
 import threading
 import json
-import random
+import logging
 
 import sys
 sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
@@ -16,6 +16,7 @@ from server.database.db_connection import Database
 '''This file will handle the hosting of the server on the itnernet.'''
 class ServerController:
     def __init__(self):
+        logging.basicConfig(filename="server_controller.log", level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
         self.db = None
         self.gm = None
         self.main()
@@ -23,13 +24,14 @@ class ServerController:
     def sendResponse(self, conn, response):
         response_json = json.dumps(response)
 
-        conn.sendall(response_json.encoded)
+        conn.sendall(response_json.encode('utf-8'))
+        print("Sent response")
 
     def handleClient(self, conn, addr):
         try:
             print(f"handling client: {addr}")
             while True:
-                data = conn.recv(2048)
+                data = conn.recv(1024)
                 
                 if not data:
                     break
@@ -47,6 +49,7 @@ class ServerController:
 
                 conn.sendall("message received".encode('utf-8'))
         except:
+            logging.error("Error sending message", exc_info=True)
             print("Closing connection.")
             return
         
@@ -86,5 +89,5 @@ class ServerController:
             print("Stopped socket.")
             s.close()  
 
-    if __name__=="__main__":
-        main()
+if __name__=="__main__":
+    sc = ServerController()

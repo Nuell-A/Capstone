@@ -27,8 +27,9 @@ class GameManagement:
     def close(self):
         self.db.closeConnection()
 
-    def getUniqueID():
+    def getUniqueID(self):
         '''Gets uniqueID and returns it in JSON format.'''
+        print('GETTING GAME ID')
         game_id = ""
         x = random.randint(100000, 999999)
         game_id = str(x)
