@@ -10,10 +10,12 @@ class QuizView(BaseView):
 
     def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
         super().__init__(screen, manager, screen_size, dt)
-        self.timer_duration = 45 # Round duration
-        self.start_time = None # timer controla
+        self.timer_duration = 10 # Round duration
+        self.start_time = None # timer control
         self.network_handler = network_handler
         self.questions = None
+        self.question_dicts = []
+        self.question_control = 0
 
     def createUI(self):
         '''Creates label, question, answer choices, and the score bar.'''
@@ -24,7 +26,7 @@ class QuizView(BaseView):
                                                   anchors={'centerx': 'centerx'}
                                                   )
         # Question box
-        self.question_textbox = pygame_gui.elements.UITextBox(html_text=self.questions[0][2], 
+        self.question_textbox = pygame_gui.elements.UILabel(text=self.question_dicts[self.question_control]['question_text'], 
                                                          relative_rect=pygame.Rect((0, 50), (300, 100),),
                                                          manager=self.manager,
                                                          container=None,
@@ -70,9 +72,15 @@ class QuizView(BaseView):
         if remaining_time <= 0:
             self.timerDone()
 
+    def resetTimer(self):
+        self.timer_duration = 10
+        self.start_time = pygame.time.get_ticks()
+
     def timerDone(self):
         '''Will have more in the future.'''
-        print("Ding ding ding ding...")
+        self.resetTimer()
+        self.question_textbox.set_text(self.question_dicts[self.question_control]['question_text'])
+        self.question_control += 1
         # Implement next question and answers combo
         # Reset timer
 
@@ -102,7 +110,17 @@ class QuizView(BaseView):
         self.network_handler.sendRequest(request)
         time.sleep(.3)
         # List within list [[q_id, g_id, quesiton, answer], [q_id, g_id, quesiton, answer]]
-        self.questions = self.network_handler.question_set
+        self.questions = self.network_handler.question_set['data']
+        print(f"QUESTIONS DATA: {self.questions}")
+
+        for question in self.questions[0]['questions']:
+            question_dict = {
+                'question_text': question[2],
+                'correct_answer': question[3],
+            }
+
+            self.question_dicts.append(question_dict)
+        # print(question_dicts[0]['question_text'])
 
     def update(self):
         '''Updates components that need to be updated.'''
@@ -112,7 +130,6 @@ class QuizView(BaseView):
     def sceneLoop(self):
         self.running = True
         self.getQuestionSet()
-        print(self.questions)
         print("creating UI quiz")
         self.createUI()
         self.start_time = pygame.time.get_ticks() # Initiates timer upon scene creation.
