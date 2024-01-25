@@ -79,8 +79,9 @@ class QuizView(BaseView):
     def timerDone(self):
         '''Will have more in the future.'''
         self.resetTimer()
-        self.question_textbox.set_text(self.question_dicts[self.question_control]['question_text'])
         self.question_control += 1
+        self.question_textbox.set_text(self.question_dicts[self.question_control]['question_text'])
+        
         # Implement next question and answers combo
         # Reset timer
 
@@ -111,7 +112,6 @@ class QuizView(BaseView):
         time.sleep(.3)
         # List within list [[q_id, g_id, quesiton, answer], [q_id, g_id, quesiton, answer]]
         self.questions = self.network_handler.question_set['data']
-        print(f"QUESTIONS DATA: {self.questions}")
 
         for question in self.questions[0]['questions']:
             question_dict = {
