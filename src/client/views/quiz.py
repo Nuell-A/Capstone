@@ -14,8 +14,8 @@ class QuizView(BaseView):
         self.start_time = None # timer control
         self.network_handler = network_handler
         self.questions = None
+        self.used_question_dicts = []
         self.question_dicts = []
-        self.question_control = 0
 
     def createUI(self):
         '''Creates label, question, answer choices, and the score bar.'''
@@ -26,7 +26,7 @@ class QuizView(BaseView):
                                                   anchors={'centerx': 'centerx'}
                                                   )
         # Question box
-        self.question_textbox = pygame_gui.elements.UILabel(text=self.question_dicts[self.question_control]['question_text'], 
+        self.question_textbox = pygame_gui.elements.UILabel(text="Default Text", 
                                                          relative_rect=pygame.Rect((0, 50), (300, 100),),
                                                          manager=self.manager,
                                                          container=None,
@@ -76,14 +76,23 @@ class QuizView(BaseView):
         self.timer_duration = 10
         self.start_time = pygame.time.get_ticks()
 
+    def updateQuestion(self):
+        '''Updates question list'''
+        try:
+            next_question = self.question_dicts.pop(0)
+            self.question_textbox.set_text(next_question['question_text'])
+            
+            self.used_question_dicts.append(next_question)
+        except IndexError:
+            print(self.used_question_dicts)
+            print(self.question_dicts)
+            print("Questions are over.")
+            
     def timerDone(self):
-        '''Will have more in the future.'''
+        '''Resets timer, moves to next question in the set.'''
         self.resetTimer()
-        self.question_control += 1
-        self.question_textbox.set_text(self.question_dicts[self.question_control]['question_text'])
+        self.updateQuestion()
         
-        # Implement next question and answers combo
-        # Reset timer
 
     def handleEvents(self):
             for event in pygame.event.get():
@@ -91,6 +100,9 @@ class QuizView(BaseView):
                     print("quitting")
                     self.scene = "quit"
                     return "quit"
+                
+                if not self.question_dicts:
+                    print("Changing to results")
                 
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
                     for button_id, button in self.answers.items():
@@ -132,11 +144,13 @@ class QuizView(BaseView):
         self.getQuestionSet()
         print("creating UI quiz")
         self.createUI()
+        self.updateQuestion() # Places initial question
         self.start_time = pygame.time.get_ticks() # Initiates timer upon scene creation.
 
         while self.running:
             self.dt
             self.running = self.handleEvents()
+
             if self.running == "quit":
                  return "quit"
             
