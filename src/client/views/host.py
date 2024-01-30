@@ -10,6 +10,7 @@ class HostView(BaseView):
         super().__init__(screen, manager, screen_size, dt)
         self.gameID = 100010 # Default/testing value
         self.network_handler = network_handler
+        self.network_handler.setCallbackResponse(self.handleResponse)
 
     def createUI(self):
         self.gameID_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 35), (150, 50)),
@@ -46,14 +47,17 @@ class HostView(BaseView):
 
         return True
     
+    def handleResponse(self, response):
+        print(f"{response['data'][0]['uniqueID']} From callback.")
+        self.gameID = response['data'][0]['uniqueID']
+        
+
     def getUniqueID(self):
         "Requests uniqueID from server"
         request = {'type': 'uniqueID'}
         print("Requesting unique ID: HOST")
         self.network_handler.sendRequest(request)
         time.sleep(.3)
-
-        self.gameID = self.network_handler.game_id['data'][0]['uniqueID']
     
     def sceneLoop(self):
         self.getUniqueID()
@@ -66,10 +70,10 @@ class HostView(BaseView):
             self.dt
             self.running = self.handleEvents()
 
-            if self.running == "quit":
+            if self.scene == "quit":
                 return "quit"
             
-            if self.running == "quiz":
+            if self.scene == "quiz":
                 self.killUI()
                 return
             

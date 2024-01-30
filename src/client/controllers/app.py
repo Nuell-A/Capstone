@@ -9,6 +9,7 @@ sys.path.insert(2, "C:\\Users\\alcal\\Documents\\Projects\\Capstone\\Capstone\\s
 from client.views.menu import MenuView
 from client.views.quiz import QuizView
 from client.views.host import HostView
+from client.views.results import ResultsView
 
 
 def gameLoop():
@@ -35,7 +36,7 @@ def gameLoop():
     menu_view = MenuView(screen, manager, screen_size, dt, network_handler)
     quiz_view = QuizView(screen, manager, screen_size, dt, network_handler)
     host_view = HostView(screen, manager, screen_size, dt, network_handler)
-
+    results_view = ResultsView(screen, manager, screen_size, dt, network_handler)
 
     while True:
         
@@ -48,6 +49,10 @@ def gameLoop():
             quiz_view.sceneLoop()
             active_scene = quiz_view.scene
 
+        if active_scene == "results":
+            results_view.sceneLoop()
+            active_scene = results_view.scene
+            
         if active_scene == "host":
             host_view.sceneLoop()
             active_scene = host_view.scene

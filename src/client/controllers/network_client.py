@@ -15,7 +15,8 @@ class NetworkClient:
         self.host = config.socket_host
         self.port = config.socket_port
         self.s = None
-        self.game_id = None
+        self.callback_response = None
+        self.game_IDs = []
         self.question_set = None
         self.connect()
 
@@ -36,11 +37,16 @@ class NetworkClient:
         
         self.s.sendall(request_dump.encode('utf-8'))
 
+    def setCallbackResponse(self, callback):
+          self.callback_response = callback
+          
     def processResponse(self, response):
         try:
             if response['type'] == "uniqueID_response":
-                            print(response['data'][0]['uniqueID'])
-                            self.game_id = response
+                            ""
+                            if self.callback_response:
+                                  self.callback_response(response)
+
             elif response['type'] == "question_set_response":
                             self.question_set = response
                             print(response['data'][0]['questions'])

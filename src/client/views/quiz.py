@@ -10,7 +10,8 @@ class QuizView(BaseView):
 
     def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
         super().__init__(screen, manager, screen_size, dt)
-        self.timer_duration = 10 # Round duration
+        self.ROUND_TIME = 3
+        self.timer_duration = self.ROUND_TIME # Round duration
         self.start_time = None # timer control
         self.network_handler = network_handler
         self.questions = None
@@ -58,6 +59,15 @@ class QuizView(BaseView):
                                                       container=None,
                                                       anchors={'centerx': 'centerx', 'top_target': self.answerchoice_panel})
         
+    def killUI(self):
+        self.timer_label.kill()
+        self.question_textbox.kill()
+        self.answerchoice_panel.kill()
+        self.score_bar.kill()
+        for answer_id, answer in self.answers.items():
+            answer.kill()
+        self.answers = {}
+        
     def updateTimer(self):
         '''Method to control timer and check if has reached 0.'''
         # Calculate current time elapsed.
@@ -73,7 +83,7 @@ class QuizView(BaseView):
             self.timerDone()
 
     def resetTimer(self):
-        self.timer_duration = 10
+        self.timer_duration = self.ROUND_TIME
         self.start_time = pygame.time.get_ticks()
 
     def updateQuestion(self):
@@ -84,9 +94,12 @@ class QuizView(BaseView):
             
             self.used_question_dicts.append(next_question)
         except IndexError:
-            print(self.used_question_dicts)
-            print(self.question_dicts)
             print("Questions are over.")
+            if not self.question_dicts:
+                print("Changing to results")
+                self.scene = "results"
+                return "results"
+            print(f"Active scene: {self.scene}")
             
     def timerDone(self):
         '''Resets timer, moves to next question in the set.'''
@@ -95,25 +108,22 @@ class QuizView(BaseView):
         
 
     def handleEvents(self):
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    print("quitting")
-                    self.scene = "quit"
-                    return "quit"
-                
-                if not self.question_dicts:
-                    print("Changing to results")
-                
-                if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                    for button_id, button in self.answers.items():
-                        if event.ui_element == button:
-                            # Implement switchcase or if-elif blocks for each button_id and check if choice is correct/wrong
-                            print(f"1Answer choice {button_id} selected.")
-                        
-                    
-                self.manager.process_events(event)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                print("quitting")
+                self.scene = "quit"
+                return "quit"
             
-            return True
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                for button_id, button in self.answers.items():
+                    if event.ui_element == button:
+                        # Implement switchcase or if-elif blocks for each button_id and check if choice is correct/wrong
+                        print(f"1Answer choice {button_id} selected.")
+                    
+                
+            self.manager.process_events(event)
+        
+        return True
 
     def getQuestionSet(self):
         "Requests uniqueID from server"
@@ -151,13 +161,13 @@ class QuizView(BaseView):
             self.dt
             self.running = self.handleEvents()
 
-            if self.running == "quit":
+            if self.scene == "quit":
                  return "quit"
             
-            if self.running == "quiz": # Temp
+            if self.scene == "results": # Temp
                 self.killUI()
                 print("killed ui")
-                return
+                return "results"
             
             self.update()
             self.draw()

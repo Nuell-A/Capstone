@@ -89,10 +89,10 @@ class MenuView(BaseView):
             self.dt
             self.running = self.handleEvents()
 
-            if self.running == "quit":
+            if self.scene == "quit":
                 return "quit"
             
-            if self.running == "host":
+            if self.scene == "host":
                 self.killUI()
                 return "host"
             
