@@ -120,22 +120,14 @@ class QuizView(BaseView):
                         # Implement switchcase or if-elif blocks for each button_id and check if choice is correct/wrong
                         print(f"1Answer choice {button_id} selected.")
                     
-                
             self.manager.process_events(event)
         
         return True
 
-    def getQuestionSet(self):
-        "Requests uniqueID from server"
-        request = {'type': 'question_set'}
-        print("Requesting question set: QUIZ")
-
-        self.network_handler.sendRequest(request)
-        time.sleep(.3)
+    def handleResponse(self, response):
+        self.questions = response
         # List within list [[q_id, g_id, quesiton, answer], [q_id, g_id, quesiton, answer]]
-        self.questions = self.network_handler.question_set['data']
-
-        for question in self.questions[0]['questions']:
+        for question in self.questions['data'][0]['questions']:
             question_dict = {
                 'question_text': question[2],
                 'correct_answer': question[3],
@@ -144,12 +136,22 @@ class QuizView(BaseView):
             self.question_dicts.append(question_dict)
         # print(question_dicts[0]['question_text'])
 
+    def getQuestionSet(self):
+        "Requests uniqueID from server"
+        request = {'type': 'question_set'}
+        print("Requesting question set: QUIZ")
+
+        self.network_handler.sendRequest(request)
+        time.sleep(.3)
+        
+
     def update(self):
         '''Updates components that need to be updated.'''
         self.updateTimer()
         self.manager.update(self.dt)
 
     def sceneLoop(self):
+        self.network_handler.setCallbackResponse(self.handleResponse)
         self.running = True
         self.getQuestionSet()
         print("creating UI quiz")

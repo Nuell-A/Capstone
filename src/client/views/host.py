@@ -10,7 +10,6 @@ class HostView(BaseView):
         super().__init__(screen, manager, screen_size, dt)
         self.gameID = 100010 # Default/testing value
         self.network_handler = network_handler
-        self.network_handler.setCallbackResponse(self.handleResponse)
 
     def createUI(self):
         self.gameID_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 35), (150, 50)),
@@ -60,6 +59,7 @@ class HostView(BaseView):
         time.sleep(.3)
     
     def sceneLoop(self):
+        self.network_handler.setCallbackResponse(self.handleResponse)
         self.getUniqueID()
         self.running = True
         print("creating UI")

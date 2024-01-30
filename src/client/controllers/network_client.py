@@ -17,7 +17,6 @@ class NetworkClient:
         self.s = None
         self.callback_response = None
         self.game_IDs = []
-        self.question_set = None
         self.connect()
 
     def connect(self):
@@ -43,13 +42,13 @@ class NetworkClient:
     def processResponse(self, response):
         try:
             if response['type'] == "uniqueID_response":
-                            ""
-                            if self.callback_response:
-                                  self.callback_response(response)
+                if self.callback_response:
+                        self.callback_response(response)
 
             elif response['type'] == "question_set_response":
-                            self.question_set = response
-                            print(response['data'][0]['questions'])
+                print(f"Sending to callback {response}")
+                if self.callback_response:
+                        self.callback_response(response)
         except:
               print("There was an error processing the response.")
               logging.error("PROCESSING RESPONSE ERROR: ", exc_info=True)

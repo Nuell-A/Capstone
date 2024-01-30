@@ -34,8 +34,8 @@ def gameLoop():
                       " server.py is running and verify host/port is configured in config.py", exc_info=True)
     # Views
     menu_view = MenuView(screen, manager, screen_size, dt, network_handler)
-    quiz_view = QuizView(screen, manager, screen_size, dt, network_handler)
     host_view = HostView(screen, manager, screen_size, dt, network_handler)
+    quiz_view = QuizView(screen, manager, screen_size, dt, network_handler)
     results_view = ResultsView(screen, manager, screen_size, dt, network_handler)
 
     while True:
@@ -52,7 +52,7 @@ def gameLoop():
         if active_scene == "results":
             results_view.sceneLoop()
             active_scene = results_view.scene
-            
+
         if active_scene == "host":
             host_view.sceneLoop()
             active_scene = host_view.scene
