@@ -29,7 +29,7 @@ class ServerController:
         if request['type'] == "uniqueID":
             print("Creating unique ID....")
             response = self.gm.getUniqueID()
-            self.active_sessions[response['data'][0]['uniqueID']] = {'conn': conn, 'addr': addr}
+            self.active_sessions[response['data'][0]['uniqueID']] = [{'conn': conn, 'addr': addr}]
             print(f"Hosting session with {addr}. \n Current active sessions: {self.active_sessions}")
             self.sendResponse(conn, response)
 
@@ -39,7 +39,8 @@ class ServerController:
             self.sendResponse(conn, response)
 
         elif request['type'] == "join_request":
-            game_id = request.get('game_id', None)
+            game_id = request['data'][0]['game_id']
+            print(f"Join request: game_id")
             if game_id: # Checks if game_id was passed
                 self.joinSession(game_id, conn, addr)
             else:
@@ -65,20 +66,37 @@ class ServerController:
                 
                 if not data:
                     break
+
                 print("REQUEST Recieved")
                 request = json.loads(data)
                 self.processRequest(request, conn, addr)
         except:
             logging.error("Error sending message", exc_info=True)
-            self.removePlayerFromSession(conn)
-            print("Client disconnected: " + str(addr))
-            print("Closing connection.")
-            conn.close()
             
+            conn.close()
+
+        print("Client disconnected: " + str(addr))
+        self.removePlayerFromSession(conn)
+        print("Closing connection.")
+        conn.close()
+
     def removePlayerFromSession(self, conn):
-        for game_id in self.active_sessions:
-            # Removes client from active session.
-            self.active_sessions[game_id] = [client for client in self.active_sessions[game_id] if client['conn'] != conn]
+        print("Removing client from active session...")
+        try:
+            # Iterate over all key/values in the dictionary
+            # game_id = game ID & client_list = [{conn, addr}, {conn, addr}, {}, ....]
+            for game_id, client_list in self.active_sessions.items():
+                # Finds the first dictionary that equals client being removed (conn)
+                client_to_remove = next((client for client in client_list if client['conn'] == conn), None)
+                # Remove the found dictionary from the list, if the client is there.
+                if client_to_remove:
+                    client_list.remove(client_to_remove)
+            # Creates new active_sessions dict with remaining clinets (conns) and removes empty ones.
+            self.active_sessions = {game_id: client_list for game_id, client_list in self.active_sessions.items() if client_list}
+            print(f"Client removed. Current active sessions: {self.active_sessions}")
+        except:
+            print("There was an error removing client from active session. Check logs")
+            logging.error("Error removing client from active session", exc_info=True)
 
     def main(self):
         self.db = Database()

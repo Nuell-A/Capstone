@@ -40,7 +40,10 @@ class JoinView(BaseView):
             
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.submit_bt:
-                    print("submitted game_id")
+                    print(self.gameID_entry.get_text())
+                    request = {'type': 'join_request', 'data': [{'game_id': self.gameID_entry.get_text()}]}
+                    self.network_handler.sendRequest(request)
+                    print("Submitted game_id")
                     
             self.manager.process_events(event)
 

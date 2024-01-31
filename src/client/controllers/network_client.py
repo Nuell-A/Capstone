@@ -24,17 +24,15 @@ class NetworkClient:
         try:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.s.connect((self.host, self.port))
-
             handler = threading.Thread(target=self.handleResponse,)
             handler.start()
         except:
             print("There was an error connecting")
 
     def sendRequest(self, request):
-        print("REQUEST sent.")
         request_dump = json.dumps(request)
-        
         self.s.sendall(request_dump.encode('utf-8'))
+        print(f"REQUEST sent. {request}")
 
     def setCallbackResponse(self, callback):
           self.callback_response = callback
@@ -49,6 +47,9 @@ class NetworkClient:
                 print(f"Sending to callback {response}")
                 if self.callback_response:
                         self.callback_response(response)
+            
+            elif response['type'] == "join_response":
+                 print(response)
         except:
               print("There was an error processing the response.")
               logging.error("PROCESSING RESPONSE ERROR: ", exc_info=True)
