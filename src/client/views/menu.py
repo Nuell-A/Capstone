@@ -9,7 +9,7 @@ class MenuView(BaseView):
     def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
-        print("running sceneloop")
+        print("Running sceneloop: MENU")
 
     def createUI(self):
         """Creating and position UI elements. Rects are used for positioning relative to
@@ -67,6 +67,8 @@ class MenuView(BaseView):
 
                 elif event.ui_element == self.join_bt:
                     print("Joining session...")
+                    self.scene = "join"
+                    return "join"
 
             self.manager.process_events(event)
 
@@ -90,11 +92,15 @@ class MenuView(BaseView):
             self.running = self.handleEvents()
 
             if self.scene == "quit":
-                return "quit"
+                return
             
             if self.scene == "host":
                 self.killUI()
-                return "host"
+                return
+            
+            if self.scene == "join":
+                self.killUI()
+                return
             
             self.update()
             self.draw()
