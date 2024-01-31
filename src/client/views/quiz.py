@@ -2,7 +2,7 @@ import pygame
 import pygame_gui
 from .base_view import BaseView
 import time
-
+import random
 
 
 class QuizView(BaseView):
@@ -64,6 +64,7 @@ class QuizView(BaseView):
         self.question_textbox.kill()
         self.answerchoice_panel.kill()
         self.score_bar.kill()
+
         for answer_id, answer in self.answers.items():
             answer.kill()
         self.answers = {}
@@ -86,6 +87,26 @@ class QuizView(BaseView):
         self.timer_duration = self.ROUND_TIME
         self.start_time = pygame.time.get_ticks()
 
+    def updateAnswers(self):
+        '''Updates answer selections'''
+        try:
+            correct_answer = self.question_dicts[0]['correct_answer']
+            wrong_answers = ['5', 'Network Engineer', 'Pizza', 'Las Vegas', '20', 
+                             'Chip', 'Andrews', 'Rodrigo', 'Sushi', 'Web Developer', 'Blackie', 
+                             'E-Money']
+
+            selected_wrong_answers = random.sample(wrong_answers, 3)
+            answer_choices = [correct_answer] + selected_wrong_answers
+            random.shuffle(answer_choices)
+
+            print(answer_choices)
+            answer_key = 0
+            for answer_id, answer in self.answers.items():
+                answer.set_text(answer_choices[answer_key])
+                answer_key += 1
+        except IndexError:
+            print("Answers are over")
+
     def updateQuestion(self):
         '''Updates question list'''
         try:
@@ -104,6 +125,7 @@ class QuizView(BaseView):
     def timerDone(self):
         '''Resets timer, moves to next question in the set.'''
         self.resetTimer()
+        self.updateAnswers()
         self.updateQuestion()
         
 
@@ -156,6 +178,7 @@ class QuizView(BaseView):
         self.getQuestionSet()
         print("creating UI quiz")
         self.createUI()
+        self.updateAnswers() # Initial answer selection
         self.updateQuestion() # Places initial question
         self.start_time = pygame.time.get_ticks() # Initiates timer upon scene creation.
 
