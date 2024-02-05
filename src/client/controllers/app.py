@@ -11,6 +11,7 @@ from client.views.quiz import QuizView
 from client.views.host import HostView
 from client.views.join import JoinView
 from client.views.results import ResultsView
+from client.views.lobby import LobbyView
 
 
 def gameLoop():
@@ -39,6 +40,7 @@ def gameLoop():
     join_view = JoinView(screen, manager, screen_size, dt, network_handler)
     quiz_view = QuizView(screen, manager, screen_size, dt, network_handler)
     results_view = ResultsView(screen, manager, screen_size, dt, network_handler)
+    lobby_view = LobbyView(screen, manager, screen_size, dt, network_handler)
 
     while True:
         
@@ -48,6 +50,13 @@ def gameLoop():
             active_scene = menu_view.scene
 
         if active_scene == "quiz":
+            if host_view.gameID:
+                quiz_view.game_id = host_view.gameID
+                print(quiz_view.game_id)
+            else:
+                quiz_view.game_id = join_view.game_id
+                print(quiz_view.game_id)
+
             quiz_view.sceneLoop()
             active_scene = quiz_view.scene
 
@@ -59,6 +68,10 @@ def gameLoop():
             join_view.sceneLoop()
             active_scene = join_view.scene
             
+        if active_scene == "lobby":
+            lobby_view.sceneLoop()
+            active_scene = lobby_view.scene
+
         if active_scene == "host":
             host_view.sceneLoop()
             active_scene = host_view.scene

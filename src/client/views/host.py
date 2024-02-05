@@ -38,17 +38,20 @@ class HostView(BaseView):
             
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.start_game_bt:
-                    print("Starting game!")
-                    self.scene =  "quiz"
-                    return "quiz"
+                    request = {'type': 'start_request', 'game_id': self.gameID}
+                    self.network_handler.sendRequest(request)
 
             self.manager.process_events(event)
 
         return True
     
     def handleResponse(self, response):
-        print(f"{response['data'][0]['uniqueID']} From callback.")
-        self.gameID = response['data'][0]['uniqueID']
+        if response['type'] == "uniqueID_response":
+            print(f"{response['data'][0]['uniqueID']} From callback.")
+            self.gameID = response['data'][0]['uniqueID']
+        elif response['type'] == "start_response":
+            self.scene = "quiz"
+
         
 
     def getUniqueID(self):

@@ -39,17 +39,8 @@ class NetworkClient:
           
     def processResponse(self, response):
         try:
-            if response['type'] == "uniqueID_response":
-                if self.callback_response:
-                        self.callback_response(response)
-
-            elif response['type'] == "question_set_response":
-                print(f"Sending to callback {response}")
-                if self.callback_response:
-                        self.callback_response(response)
-            
-            elif response['type'] == "join_response":
-                 print(response)
+            if self.callback_response:
+                      self.callback_response(response)
         except:
               print("There was an error processing the response.")
               logging.error("PROCESSING RESPONSE ERROR: ", exc_info=True)
@@ -64,6 +55,7 @@ class NetworkClient:
 
                 response  = json.loads(data)
                 print("RESPONSE received.")
+                print(response)
                 self.processResponse(response)
             except:
                 print("There was an error receiving data.")

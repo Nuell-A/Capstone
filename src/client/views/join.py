@@ -7,6 +7,7 @@ class JoinView(BaseView):
     def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
+        self.game_id = None
         print("Waiting for game ID.")
 
     def createUI(self):
@@ -40,7 +41,7 @@ class JoinView(BaseView):
             
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.submit_bt:
-                    print(self.gameID_entry.get_text())
+                    self.game_id = self.gameID_entry.get_text()
                     request = {'type': 'join_request', 'data': [{'game_id': self.gameID_entry.get_text()}]}
                     self.network_handler.sendRequest(request)
                     print("Submitted game_id")
@@ -49,8 +50,10 @@ class JoinView(BaseView):
 
         return True
 
-    def handleResponse(self):
-        pass
+    def handleResponse(self, response):
+        if response['status'] == "Success":
+            print("Joined game successfully, switching to lobby.")
+            self.scene = "lobby"
 
     def update(self):
         # Will only execute after every 5 frames to limit text effect on game title. 
@@ -60,6 +63,7 @@ class JoinView(BaseView):
         self.frame_counter += 1
 
     def sceneLoop(self):
+        self.network_handler.setCallbackResponse(self.handleResponse)
         self.frame_counter = 0
         self.running = True
         print("Creating UI: JOIN")
@@ -72,9 +76,9 @@ class JoinView(BaseView):
             if self.scene == "quit":
                 return "quit"
             
-            if self.scene == "host":
+            if self.scene == "lobby":
                 self.killUI()
-                return "host"
+                return "lobby"
             
             self.update()
             self.draw()

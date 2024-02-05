@@ -18,25 +18,43 @@ class ServerController:
         self.db = None
         self.gm = None
         self.active_sessions = {}
+        self.question_sets = {}
         self.main()
 
     def sendResponse(self, conn, response):
         response_json = json.dumps(response)
         conn.sendall(response_json.encode('utf-8'))
         print("Sent RESPONSE.")
+
+    def sendToSession(self, game_id, update):
+        '''Sends an update (response, request, etc.) to clients in a game session.'''
+        try:
+            if game_id in self.active_sessions:
+                print(f"Sending updates to clients in {game_id}")
+                for client in self.active_sessions[game_id]:
+                    conn = client['conn']
+                    self.sendResponse(conn, update)
+        except:
+            print(f"There was an error updating clients for {game_id}")
+            logging.error("Error updating session", exc_info=True)
+
         
     def processRequest(self, request, conn, addr):
         if request['type'] == "uniqueID":
             print("Creating unique ID....")
             response = self.gm.getUniqueID()
-            self.active_sessions[response['data'][0]['uniqueID']] = [{'conn': conn, 'addr': addr}]
+            game_id = response['data'][0]['uniqueID']
+            response_questionset = self.gm.getQuestions(5)
+            self.active_sessions[game_id] = [{'conn': conn, 'addr': addr}]
+            self.question_sets[game_id] = response_questionset
             print(f"Hosting session with {addr}. \n Current active sessions: {self.active_sessions}")
             self.sendResponse(conn, response)
 
         elif request['type'] == "question_set":
             print("Getting question set...")
-            response = self.gm.getQuestions(5)
-            self.sendResponse(conn, response)
+            game_id = request['game_id']
+            response = self.question_sets[game_id]
+            self.sendToSession(game_id, response)
 
         elif request['type'] == "join_request":
             game_id = request['data'][0]['game_id']
@@ -46,6 +64,13 @@ class ServerController:
             else:
                 response = {'type': 'join_response', 'status': 'Error', 'message': 'Game ID not provided.'}
                 self.sendResponse(conn, response)
+
+        elif request['type'] == "start_request":
+            print("Recieved update request.")
+            game_id = request['game_id']
+            update = {'type': 'start_response'}
+            self.sendToSession(game_id, update)
+
 
     def joinSession(self, game_id, conn, addr):
         if game_id in self.active_sessions:

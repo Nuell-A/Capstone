@@ -17,6 +17,7 @@ class QuizView(BaseView):
         self.questions = None
         self.used_question_dicts = []
         self.question_dicts = []
+        self.game_id = None
 
     def createUI(self):
         '''Creates label, question, answer choices, and the score bar.'''
@@ -160,7 +161,7 @@ class QuizView(BaseView):
 
     def getQuestionSet(self):
         "Requests uniqueID from server"
-        request = {'type': 'question_set'}
+        request = {'type': 'question_set', 'game_id': self.game_id}
         print("Requesting question set: QUIZ")
 
         self.network_handler.sendRequest(request)
