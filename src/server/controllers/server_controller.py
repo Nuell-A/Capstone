@@ -42,54 +42,47 @@ class ServerController:
         
     def processRequest(self, request, conn, addr):
         if request['type'] == "uniqueID":
-            print("Creating unique ID....")
-            response = self.gm.getUniqueID()
-            game_id = response['data'][0]['uniqueID']
-            name = request['data'][0]['name']
-            response_questionset = self.gm.getQuestions(5)
-            self.active_sessions[game_id] = [{'conn': conn, 'addr': addr}]
-            self.question_sets[game_id] = response_questionset
-            self.players[conn] = [{'name': name, 'score': 0}]
-            print(self.question_sets)
-            print(f"Hosting session with {addr}.\nCurrent active sessions: {self.active_sessions}")
-            self.sendResponse(conn, response)
-
+            self.handleUniqueIDRequest(request, conn, addr)
         elif request['type'] == "question_set":
-            print("Getting question set...")
-            game_id = request['game_id']
-            response = self.question_sets[game_id]
-            self.sendToSession(game_id, response)
-
+            self.handleQuestionSetRequest(request)
         elif request['type'] == "join_request":
-            print(f"JOIN REQUEST: {request}")
-            game_id = request['data'][0]['game_id']
-            name = request['data'][0]['name']
-            print(f"Join request: game_id")
-            if game_id: # Checks if game_id was passed
-                self.joinSession(game_id, name, conn, addr)
-            else:
-                response = {'type': 'join_response', 'status': 'Error', 'message': 'Game ID not provided.'}
-                self.sendResponse(conn, response)
-
+            self.handleJoinRequest(request, conn, addr)
         elif request['type'] == "start_request":
-            print("Recieved update request.")
-            game_id = request['game_id']
-            update = {'type': 'start_response'}
-            self.sendToSession(game_id, update)
-
+            self.handleStartRequest(request)
         elif request['type'] == "check_answer":
-            print("Checking answer")
-            answer = request['selected_answer']
-            game_id = request['game_id']
-            print(game_id)
-            questions = self.question_sets[game_id]['data'][0]['questions']
+            self.handleCheckAnswerRequest(request, conn)
 
-            for question in questions:
-                correct_answer = question[3]
-                if answer == correct_answer:
-                    self.players[conn][0]['score'] +=10
+    def handleUniqueIDRequest(self, request, conn, addr):
+        print("Creating unique ID....")
+        # Get response. Set question set, game_id, and name.
+        response = self.gm.getUniqueID()
+        question_set = self.gm.getQuestions(5)
+        game_id = response['data'][0]['uniqueID']
+        name = request['data'][0]['name']
+        # Initial session creation with host/game id for managing join requests.
+        self.question_sets[game_id] = question_set
+        self.active_sessions[game_id] = [{'conn': conn, 'addr': addr}]
+        self.players[conn] = [{'name': name, 'score': 0}]
+        # Info for server.
+        print(f"PLAYER {name} is now hosting a session.\nCURRENT PLAYERS: {self.players}")
+        print("---------------------------------------------")
+        print(f"ACTIVE SESSIONS: {self.active_sessions}")
+        self.sendResponse(conn, response)
 
-            response = {'type': 'check_answer_response', 'data': [{'score': self.players[conn]}]}
+    def handleQuestionSetRequest(self, request):
+        print("Getting question set...")
+        game_id = request.get('game_id')
+        response = self.question_sets[game_id]
+        self.sendToSession(game_id, response)
+
+    def handleJoinRequest(self, request, conn, addr):
+        print(f"JOIN REQUEST: {request}")
+        game_id = request['data'][0]['game_id']
+        name = request['data'][0]['name']
+        if game_id: # Checks if game_id was passed
+            self.joinSession(game_id, name, conn, addr)
+        else:
+            response = {'type': 'join_response', 'status': 'Error', 'message': 'Game ID not provided.'}
             self.sendResponse(conn, response)
 
     def joinSession(self, game_id, name, conn, addr):
@@ -103,6 +96,25 @@ class ServerController:
         else:
             response = {'type':'join_response', 'status': 'Error', 'message': 'Check game ID and try again.'}
             self.sendResponse(conn, response)
+    
+    def handleStartRequest(self, request):
+        print(f"Recieved update request: {request}")
+        game_id = request.get('game_id')
+        update = {'type': 'start_response'}
+        self.sendToSession(game_id, update)
+
+    def handleCheckAnswerRequest(self, request, conn):
+        print("Checking answer")
+        answer = request.get('selected_answer')
+        game_id = request.get('game_id')
+        questions = self.question_sets[game_id]['data'][0]['questions']
+        # Check if answer matches correct answer in question_set.
+        for question in questions:
+            correct_answer = question[3]
+            if answer == correct_answer:
+                self.players[conn][0]['score'] +=10
+        response = {'type': 'check_answer_response', 'data': [{'score': self.players[conn]}]}
+        self.sendResponse(conn, response)
 
     def handleClient(self, conn, addr):
         try:
