@@ -86,7 +86,7 @@ class GameManagement:
         questions = []
         cursor = self.db.c.cursor()
 
-        print("Getting questions set:")
+        print("Getting questions FROM DB:")
 
         query = "SELECT * FROM questions ORDER BY RAND() LIMIT %s"
         cursor.execute(query, (size,))
@@ -94,13 +94,7 @@ class GameManagement:
           e.g. [(row1), (row2), etc.]'''
         questions = cursor.fetchall() # Gets all values from 
 
-        print("Questions set created")
+        print("Questions set LOADED")
         cursor.close()
 
-        response = {
-            'type': 'question_set_response',
-            'data': [{
-                'questions': questions,
-                },],
-        }
-        return response
+        return questions

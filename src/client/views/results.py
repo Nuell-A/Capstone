@@ -9,6 +9,7 @@ class ResultsView(BaseView):
     def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
+        self.player = player
         print("Running sceneloop: RESULTS")
 
     def createUI(self):

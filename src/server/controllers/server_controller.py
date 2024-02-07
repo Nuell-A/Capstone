@@ -19,7 +19,9 @@ class ServerController:
         self.gm = None
         self.active_sessions = {}
         self.question_sets = {}
+        self.wrong_answers = []
         self.players = {}
+        self.scores = {}
         self.main()
 
     def sendResponse(self, conn, response):
@@ -44,13 +46,15 @@ class ServerController:
         if request['type'] == "uniqueID":
             self.handleUniqueIDRequest(request, conn, addr)
         elif request['type'] == "question_set":
-            self.handleQuestionSetRequest(request)
+            self.handleQuestionSetRequest(request, conn)
         elif request['type'] == "join_request":
             self.handleJoinRequest(request, conn, addr)
         elif request['type'] == "start_request":
             self.handleStartRequest(request)
         elif request['type'] == "check_answer":
             self.handleCheckAnswerRequest(request, conn)
+        elif request['type'] == "get_scores":
+            self.getScores(request, conn)
 
     def handleUniqueIDRequest(self, request, conn, addr):
         print("Creating unique ID....")
@@ -67,13 +71,19 @@ class ServerController:
         print(f"PLAYER {name} is now hosting a session.\nCURRENT PLAYERS: {self.players}")
         print("---------------------------------------------")
         print(f"ACTIVE SESSIONS: {self.active_sessions}")
+        print("---------------------------------------------\n")
         self.sendResponse(conn, response)
 
-    def handleQuestionSetRequest(self, request):
-        print("Getting question set...")
+    def handleQuestionSetRequest(self, request, conn):
+        print("LOADING question set...")
         game_id = request.get('game_id')
-        response = self.question_sets[game_id]
-        self.sendToSession(game_id, response)
+        self.wrong_answers = ['5', 'Network Engineer', 'Pizza', 'Las Vegas', '20', 
+                             'Chip', 'Andrews', 'Rodrigo', 'Sushi', 'Web Developer', 'Blackie', 
+                             'E-Money']
+        questions = self.question_sets[game_id]
+        response = {'type': 'question_set_response', 'data': [{'questions': questions, 'wrong_answers': self.wrong_answers}]}
+        print("SENDING question set.\n")
+        self.sendResponse(conn, response)
 
     def handleJoinRequest(self, request, conn, addr):
         print(f"JOIN REQUEST: {request}")
@@ -90,24 +100,27 @@ class ServerController:
             player_info = {'conn': conn, 'addr': addr}
             self.active_sessions[game_id].append(player_info)
             self.players[conn] = [{'name': name, 'score': 0}]
+            print("---------------------------------------------")
             print(f"Client {addr} joined AS.\nCurrent players: {self.players}\nCurrent active session: {self.active_sessions}")
+            print("---------------------------------------------\n")
             response = {'type': 'join_response', 'status': 'Success', 'message': 'Joined session.'}
             self.sendResponse(conn, response)
         else:
+            print("Didn't join session.\n")
             response = {'type':'join_response', 'status': 'Error', 'message': 'Check game ID and try again.'}
             self.sendResponse(conn, response)
     
     def handleStartRequest(self, request):
-        print(f"Recieved update request: {request}")
+        print(f"Recieved update request: {request}\n")
         game_id = request.get('game_id')
         update = {'type': 'start_response'}
         self.sendToSession(game_id, update)
 
     def handleCheckAnswerRequest(self, request, conn):
-        print("Checking answer")
+        print("Checking answer.\n")
         answer = request.get('selected_answer')
         game_id = request.get('game_id')
-        questions = self.question_sets[game_id]['data'][0]['questions']
+        questions = self.question_sets[game_id]
         # Check if answer matches correct answer in question_set.
         for question in questions:
             correct_answer = question[3]
@@ -116,6 +129,8 @@ class ServerController:
         response = {'type': 'check_answer_response', 'data': [{'score': self.players[conn]}]}
         self.sendResponse(conn, response)
 
+    def getScores(self, request, conn):
+        pass
     def handleClient(self, conn, addr):
         try:
             print(f"Handling client: {addr}")

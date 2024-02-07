@@ -49,7 +49,10 @@ class HostView(BaseView):
     def handleResponse(self, response):
         if response['type'] == "uniqueID_response":
             print(f"{response['data'][0]['uniqueID']} From callback.")
-            self.gameID = response['data'][0]['uniqueID']
+            game_id = response['data'][0]['uniqueID']
+            self.player.setGameID(game_id)
+            self.gameID = self.player.getGameID()
+            print(f"Game ID set: {self.gameID}")
         elif response['type'] == "start_response":
             self.scene = "quiz"
 

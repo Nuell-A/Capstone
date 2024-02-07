@@ -16,7 +16,6 @@ class NetworkClient:
         self.port = config.socket_port
         self.s = None
         self.callback_response = None
-        self.game_IDs = []
         self.connect()
 
     def connect(self):
@@ -26,13 +25,14 @@ class NetworkClient:
             self.s.connect((self.host, self.port))
             handler = threading.Thread(target=self.handleResponse,)
             handler.start()
+            print("Successfully connected to server... ready to handle send/receives.")
         except:
             print("There was an error connecting")
 
     def sendRequest(self, request):
         request_dump = json.dumps(request)
         self.s.sendall(request_dump.encode('utf-8'))
-        print(f"REQUEST sent. {request}")
+        print(f"REQUEST sent. {request}\n")
 
     def setCallbackResponse(self, callback):
           self.callback_response = callback
@@ -40,7 +40,8 @@ class NetworkClient:
     def processResponse(self, response):
         try:
             if self.callback_response:
-                      self.callback_response(response)
+                self.callback_response(response)
+                print("")
         except:
               print("There was an error processing the response.")
               logging.error("PROCESSING RESPONSE ERROR: ", exc_info=True)

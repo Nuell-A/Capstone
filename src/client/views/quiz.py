@@ -17,7 +17,9 @@ class QuizView(BaseView):
         self.questions = None
         self.used_question_dicts = []
         self.question_dicts = []
-        self.game_id = None
+        self.wrong_answers = []
+        self.player = player
+        self.game_id = self.player.getGameID()
         self.selected_answer = None
         self.score = 0
 
@@ -94,15 +96,10 @@ class QuizView(BaseView):
         '''Updates answer selections'''
         try:
             correct_answer = self.question_dicts[0]['correct_answer']
-            wrong_answers = ['5', 'Network Engineer', 'Pizza', 'Las Vegas', '20', 
-                             'Chip', 'Andrews', 'Rodrigo', 'Sushi', 'Web Developer', 'Blackie', 
-                             'E-Money']
-
-            selected_wrong_answers = random.sample(wrong_answers, 3)
+            selected_wrong_answers = random.sample(self.wrong_answers, 3)
             answer_choices = [correct_answer] + selected_wrong_answers
             random.shuffle(answer_choices)
 
-            print(answer_choices)
             answer_key = 0
             for answer_id, answer in self.answers.items():
                 answer.set_text(answer_choices[answer_key])
@@ -163,9 +160,14 @@ class QuizView(BaseView):
                 }
 
                 self.question_dicts.append(question_dict)
+            
+            self.wrong_answers = response['data'][0]['wrong_answers']
         
         elif response['type'] == 'check_answer_response':
-            print(f"Current score: {response['data'][0]['score']}")
+            score = response['data'][0]['score']
+            self.player.setScore(score)
+            print(f"Current score: {self.player}")
+
 
     def checkAnswer(self):
         '''Sends last selected asnwer to server and checks if it's correct or not.'''
