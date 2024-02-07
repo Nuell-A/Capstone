@@ -19,6 +19,7 @@ class ServerController:
         self.gm = None
         self.active_sessions = {}
         self.question_sets = {}
+        self.players = {}
         self.main()
 
     def sendResponse(self, conn, response):
@@ -44,10 +45,13 @@ class ServerController:
             print("Creating unique ID....")
             response = self.gm.getUniqueID()
             game_id = response['data'][0]['uniqueID']
+            name = request['data'][0]['name']
             response_questionset = self.gm.getQuestions(5)
             self.active_sessions[game_id] = [{'conn': conn, 'addr': addr}]
             self.question_sets[game_id] = response_questionset
-            print(f"Hosting session with {addr}. \n Current active sessions: {self.active_sessions}")
+            self.players[conn] = [{'name': name, 'score': 0}]
+            print(self.question_sets)
+            print(f"Hosting session with {addr}.\nCurrent active sessions: {self.active_sessions}")
             self.sendResponse(conn, response)
 
         elif request['type'] == "question_set":
@@ -57,10 +61,12 @@ class ServerController:
             self.sendToSession(game_id, response)
 
         elif request['type'] == "join_request":
+            print(f"JOIN REQUEST: {request}")
             game_id = request['data'][0]['game_id']
+            name = request['data'][0]['name']
             print(f"Join request: game_id")
             if game_id: # Checks if game_id was passed
-                self.joinSession(game_id, conn, addr)
+                self.joinSession(game_id, name, conn, addr)
             else:
                 response = {'type': 'join_response', 'status': 'Error', 'message': 'Game ID not provided.'}
                 self.sendResponse(conn, response)
@@ -71,12 +77,27 @@ class ServerController:
             update = {'type': 'start_response'}
             self.sendToSession(game_id, update)
 
+        elif request['type'] == "check_answer":
+            print("Checking answer")
+            answer = request['selected_answer']
+            game_id = request['game_id']
+            print(game_id)
+            questions = self.question_sets[game_id]['data'][0]['questions']
 
-    def joinSession(self, game_id, conn, addr):
+            for question in questions:
+                correct_answer = question[3]
+                if answer == correct_answer:
+                    self.players[conn][0]['score'] +=10
+
+            response = {'type': 'check_answer_response', 'data': [{'score': self.players[conn]}]}
+            self.sendResponse(conn, response)
+
+    def joinSession(self, game_id, name, conn, addr):
         if game_id in self.active_sessions:
             player_info = {'conn': conn, 'addr': addr}
             self.active_sessions[game_id].append(player_info)
-            print(f"Client {addr} joined. Current active session: {self.active_sessions}")
+            self.players[conn] = [{'name': name, 'score': 0}]
+            print(f"Client {addr} joined AS.\nCurrent players: {self.players}\nCurrent active session: {self.active_sessions}")
             response = {'type': 'join_response', 'status': 'Success', 'message': 'Joined session.'}
             self.sendResponse(conn, response)
         else:

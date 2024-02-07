@@ -2,6 +2,7 @@ import pygame
 import pygame_gui
 import logging
 from network_client import NetworkClient
+from player import Player
 
 import sys
 sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src") # Mac
@@ -35,12 +36,14 @@ def gameLoop():
         logging.error(f"There was an error connecting to the server. Make sure that" +
                       " server.py is running and verify host/port is configured in config.py", exc_info=True)
     # Views
-    menu_view = MenuView(screen, manager, screen_size, dt, network_handler)
-    host_view = HostView(screen, manager, screen_size, dt, network_handler)
-    join_view = JoinView(screen, manager, screen_size, dt, network_handler)
-    quiz_view = QuizView(screen, manager, screen_size, dt, network_handler)
-    results_view = ResultsView(screen, manager, screen_size, dt, network_handler)
-    lobby_view = LobbyView(screen, manager, screen_size, dt, network_handler)
+    player = Player()
+    menu_view = MenuView(screen, manager, screen_size, dt, network_handler, player)
+    host_view = HostView(screen, manager, screen_size, dt, network_handler, player)
+    join_view = JoinView(screen, manager, screen_size, dt, network_handler, player)
+    quiz_view = QuizView(screen, manager, screen_size, dt, network_handler, player)
+    results_view = ResultsView(screen, manager, screen_size, dt, network_handler, player)
+    lobby_view = LobbyView(screen, manager, screen_size, dt, network_handler, player)
+    
 
     while True:
         
@@ -52,10 +55,10 @@ def gameLoop():
         if active_scene == "quiz":
             if host_view.gameID:
                 quiz_view.game_id = host_view.gameID
-                print(quiz_view.game_id)
+                print(f"{quiz_view.game_id} FROM APP.PY")
             else:
                 quiz_view.game_id = join_view.game_id
-                print(quiz_view.game_id)
+                print(f"{quiz_view.game_id} FROM APP.PY")
 
             quiz_view.sceneLoop()
             active_scene = quiz_view.scene

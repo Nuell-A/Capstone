@@ -4,10 +4,11 @@ import pygame_gui
 
 class JoinView(BaseView):
 
-    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
+    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
         self.game_id = None
+        self.player = player
         print("Waiting for game ID.")
 
     def createUI(self):
@@ -42,7 +43,8 @@ class JoinView(BaseView):
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.submit_bt:
                     self.game_id = self.gameID_entry.get_text()
-                    request = {'type': 'join_request', 'data': [{'game_id': self.gameID_entry.get_text()}]}
+                    name = self.player.getName()
+                    request = {'type': 'join_request', 'data': [{'game_id': self.game_id, 'name': name}]}
                     self.network_handler.sendRequest(request)
                     print("Submitted game_id")
                     

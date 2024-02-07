@@ -6,7 +6,7 @@ from .base_view import BaseView
 class ResultsView(BaseView):
     """Handles all functions related to the Menu view."""
 
-    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
+    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
         print("Running sceneloop: RESULTS")

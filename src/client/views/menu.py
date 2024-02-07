@@ -6,8 +6,9 @@ from .base_view import BaseView
 class MenuView(BaseView):
     """Handles all functions related to the Menu view."""
 
-    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
+    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
+        self.player = player
         self.network_handler = network_handler
         print("Running sceneloop: MENU")
 
@@ -39,17 +40,23 @@ class MenuView(BaseView):
         self.title_label.set_active_effect(pygame_gui.TEXT_EFFECT_BOUNCE, effect_tag='title')
         # TextBoxEntry
         self.username_text = pygame_gui.elements.UITextEntryBox(relative_rect=pygame.Rect((0, 80), (250, 50)),
-                                                                initial_text="Type user name here.....",
+                                                                initial_text="",
                                                                 manager=self.manager,
                                                                 container=None,
                                                                 anchors={'centerx': 'centerx',
                                                                          'top_target': self.join_bt})
+        self.username_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 350), (150, 50)),
+                                                          text="Please input name:",
+                                                          manager=self.manager,
+                                                          container=None,
+                                                          anchors={'centerx': 'centerx',})
         
     def killUI(self):
         self.host_bt.kill()
         self.join_bt.kill()
         self.title_label.kill()
         self.username_text.kill()
+        self.username_label.kill()
 
     def handleEvents(self):
         """Checks for specific events and acts accordingly."""
@@ -62,13 +69,27 @@ class MenuView(BaseView):
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.host_bt:
                     print("Hosting session...")
-                    self.scene = "host"
-                    return "host"
+                    name = self.username_text.get_text()
+                    if name:
+                        self.player.setName(name)
+                        print(self.player)
+                        self.scene = "host"
+                        return "host"
+                    else:
+                        print("Please enter a name")
+                        return True
 
                 elif event.ui_element == self.join_bt:
                     print("Joining session...")
-                    self.scene = "join"
-                    return "join"
+                    name = self.username_text.get_text()
+                    if name:
+                        self.player.setName(name)
+                        print(self.player)
+                        self.scene = "join"
+                        return "join"
+                    else:
+                        print("Please enter a name")
+                        return True
 
             self.manager.process_events(event)
 

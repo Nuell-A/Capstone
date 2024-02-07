@@ -6,9 +6,10 @@ import time
 
 class HostView(BaseView):
 
-    def __init__(self, screen, manager, screen_size, dt, network_handler: object):
+    def __init__(self, screen, manager, screen_size, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
-        self.gameID = 100010 # Default/testing value
+        self.gameID = None # Default/testing value
+        self.player = player
         self.network_handler = network_handler
 
     def createUI(self):
@@ -56,7 +57,8 @@ class HostView(BaseView):
 
     def getUniqueID(self):
         "Requests uniqueID from server"
-        request = {'type': 'uniqueID'}
+        name = self.player.getName()
+        request = {'type': 'uniqueID', 'data': [{'name': name}]}
         print("Requesting unique ID: HOST")
         self.network_handler.sendRequest(request)
         time.sleep(.3)

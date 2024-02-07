@@ -8,7 +8,7 @@ import random
 class QuizView(BaseView):
     '''Method displays the UI, controls events and the timer.'''
 
-    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
+    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
         self.ROUND_TIME = 3
         self.timer_duration = self.ROUND_TIME # Round duration
@@ -18,6 +18,8 @@ class QuizView(BaseView):
         self.used_question_dicts = []
         self.question_dicts = []
         self.game_id = None
+        self.selected_answer = None
+        self.score = 0
 
     def createUI(self):
         '''Creates label, question, answer choices, and the score bar.'''
@@ -125,6 +127,9 @@ class QuizView(BaseView):
             
     def timerDone(self):
         '''Resets timer, moves to next question in the set.'''
+        self.checkAnswer()
+        # Resets answer selection for new question/answer combo
+        self.selected_answer = None
         self.resetTimer()
         self.updateAnswers()
         self.updateQuestion()
@@ -140,24 +145,45 @@ class QuizView(BaseView):
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 for button_id, button in self.answers.items():
                     if event.ui_element == button:
-                        # Implement switchcase or if-elif blocks for each button_id and check if choice is correct/wrong
-                        print(f"1Answer choice {button_id} selected.")
+                        print(f"{button_id} selected: {button.text}")
+                        self.selected_answer = {button.text}
                     
             self.manager.process_events(event)
         
         return True
 
     def handleResponse(self, response):
-        self.questions = response
-        # List within list [[q_id, g_id, quesiton, answer], [q_id, g_id, quesiton, answer]]
-        for question in self.questions['data'][0]['questions']:
-            question_dict = {
-                'question_text': question[2],
-                'correct_answer': question[3],
-            }
+        if response['type'] == 'question_set_response':
+            self.questions = response
+            # List within list [[q_id, g_id, quesiton, answer], [q_id, g_id, quesiton, answer]]
+            for question in self.questions['data'][0]['questions']:
+                question_dict = {
+                    'question_text': question[2],
+                    'correct_answer': question[3],
+                }
 
-            self.question_dicts.append(question_dict)
-        # print(question_dicts[0]['question_text'])
+                self.question_dicts.append(question_dict)
+        
+        elif response['type'] == 'check_answer_response':
+            print(f"Current score: {response['data'][0]['score']}")
+
+    def checkAnswer(self):
+        '''Sends last selected asnwer to server and checks if it's correct or not.'''
+        if self.selected_answer:
+            selected_answer = list(self.selected_answer)
+            print(selected_answer[0])
+            print(self.game_id)
+            request = {'type': 'check_answer', 'selected_answer': selected_answer[0], 'game_id': self.game_id}
+            print("Sending answer to server.")
+            self.network_handler.sendRequest(request)
+            time.sleep(.3)
+        else:
+            selected_answer = self.selected_answer
+            print(self.game_id)
+            request = {'type': 'check_answer', 'selected_answer': selected_answer, 'game_id': self.game_id}
+            print("Sending answer to server. NONE")
+            self.network_handler.sendRequest(request)
+            time.sleep(3)
 
     def getQuestionSet(self):
         "Requests uniqueID from server"

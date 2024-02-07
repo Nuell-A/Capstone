@@ -4,7 +4,7 @@ import pygame_gui
 
 class LobbyView(BaseView):
 
-    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object):
+    def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
         print("Waiting for host to start.")
