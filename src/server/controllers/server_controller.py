@@ -21,6 +21,7 @@ class ServerController:
         self.question_sets = {}
         self.wrong_answers = []
         self.players = {}
+        self.client_scores_sent = set()
         self.main()
 
     def sendResponse(self, conn, response):
@@ -129,7 +130,19 @@ class ServerController:
         self.sendResponse(conn, response)
 
     def getScores(self, request, conn):
-        pass
+        game_id = request['data'][0]['game_id']
+        if game_id in self.active_sessions:
+            player_info_list = [] # Will hold dictionaries for each player.
+            for client in self.active_sessions[game_id]:
+                conn = client['conn']
+                if conn in self.players and conn not in self.client_scores_sent:
+                    # Gets first entry in list (dict with player info)
+                    player_info = self.players[conn][0]
+                    player_info_list.append(player_info)
+                    self.client_scores_sent.add(conn)
+                    response = {'type': 'get_scores_response', 'data': player_info_list}
+                    self.sendToSession(game_id, response)
+        
     def handleClient(self, conn, addr):
         try:
             print(f"Handling client: {addr}")

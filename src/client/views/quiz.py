@@ -185,7 +185,7 @@ class QuizView(BaseView):
             request = {'type': 'check_answer', 'selected_answer': selected_answer, 'game_id': self.game_id}
             print("Sending answer to server. NONE")
             self.network_handler.sendRequest(request)
-            time.sleep(2)
+            time.sleep(.2)
 
     def getQuestionSet(self):
         "Requests uniqueID from server"
