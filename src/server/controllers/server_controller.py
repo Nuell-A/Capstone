@@ -139,7 +139,6 @@ class ServerController:
                     # Gets first entry in list (dict with player info)
                     player_info = self.players[conn][0]
                     player_info_list.append(player_info)
-                    self.client_scores_sent.add(conn)
                     response = {'type': 'get_scores_response', 'data': player_info_list}
                     self.sendToSession(game_id, response)
         
@@ -189,7 +188,7 @@ class ServerController:
         print("Starting socket...")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IPV4 and TCP
         try:
-            s.bind((config.socket_host, config.socket_port))
+            s.bind(("172.30.21.2", config.socket_port))
             s.listen()
             print("Socket binded successfully.")
             # Once accept is called it blocks script execution, hence why threading is needed.

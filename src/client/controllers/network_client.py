@@ -22,7 +22,7 @@ class NetworkClient:
         "Connects to server"
         try:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.connect((self.host, self.port))
+            self.s.connect(("172.30.21.2", self.port))
             handler = threading.Thread(target=self.handleResponse,)
             handler.start()
             print("Successfully connected to server... ready to handle send/receives.")

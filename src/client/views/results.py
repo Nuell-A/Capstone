@@ -11,7 +11,6 @@ class ResultsView(BaseView):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
         self.player = player
-        self.player_info_list = None
         print("Running sceneloop: RESULTS")
 
     def createUI(self):
@@ -69,9 +68,9 @@ class ResultsView(BaseView):
 
     def handleResponse(self, response):
         try:
-                if response['type'] == 'get_scores_response':
-                        self.player_info_list = response['data'] # 'data' = [{'name': name, 'score': score}]
-                        print(self.player_info_list)
+            if response['type'] == 'get_scores_response':
+                    self.player_info_list = response['data'] # 'data' = [{'name': name, 'score': score}]
+                    print(self.player_info_list)
         except:
             print("There was an error handling the response. Most likely you already have the data.")
 
