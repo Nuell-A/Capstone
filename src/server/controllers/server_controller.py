@@ -21,7 +21,6 @@ class ServerController:
         self.question_sets = {}
         self.wrong_answers = []
         self.players = {}
-        self.client_scores_sent = set()
         self.main()
 
     def sendResponse(self, conn, response):
