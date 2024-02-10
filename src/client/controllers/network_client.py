@@ -50,7 +50,6 @@ class NetworkClient:
         while True:
             try:
                 data = self.s.recv(1024).decode('utf-8')
-                
                 if not data:
                     break
 
