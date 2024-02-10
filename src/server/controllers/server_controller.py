@@ -48,6 +48,8 @@ class ServerController:
             self.handleQuestionSetRequest(request, conn)
         elif request['type'] == "join_request":
             self.handleJoinRequest(request, conn, addr)
+        elif request['type'] == "chat":
+            self.handleChatRequest(request, conn)
         elif request['type'] == "start_request":
             self.handleStartRequest(request)
         elif request['type'] == "check_answer":
@@ -94,6 +96,15 @@ class ServerController:
             response = {'type': 'join_response', 'status': 'Error', 'message': 'Game ID not provided.'}
             self.sendResponse(conn, response)
 
+    def handleChatRequest(self, request, conn):
+        print("Hello from chat func.")
+        game_id = request.get('game_id')
+        message = request.get('message')
+        print(f"{game_id} and {message}")
+        client_name = self.players[conn][0]['name']
+        update = {'type': 'chat_response', 'data': [{'name': client_name, 'message': message}]}
+        self.sendToSession(game_id, update)
+
     def joinSession(self, game_id, name, conn, addr):
         if game_id in self.active_sessions:
             player_info = {'conn': conn, 'addr': addr}
@@ -134,7 +145,7 @@ class ServerController:
             player_info_list = [] # Will hold dictionaries for each player.
             for client in self.active_sessions[game_id]:
                 conn = client['conn']
-                if conn in self.players and conn not in self.client_scores_sent:
+                if conn in self.players:
                     # Gets first entry in list (dict with player info)
                     player_info = self.players[conn][0]
                     player_info_list.append(player_info)
@@ -149,13 +160,12 @@ class ServerController:
                 
                 if not data:
                     break
-
                 print("REQUEST Recieved")
                 request = json.loads(data)
                 self.processRequest(request, conn, addr)
         except:
             logging.error("Error sending message", exc_info=True)
-            
+            print("Check logs. Error handling request.")
             conn.close()
 
         print("Client disconnected: " + str(addr))

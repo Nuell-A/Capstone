@@ -11,7 +11,6 @@ class ResultsView(BaseView):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
         self.player = player
-        print("Running sceneloop: RESULTS")
 
     def createUI(self):
         """Creating and positioning UI elements. Rects are used for positioning relative to
@@ -31,7 +30,6 @@ class ResultsView(BaseView):
         x_offset = 10
         y_offset = 10
         spacing = 30
-
         for player in self.player_info_list:
             name = player['name']
             score = player['score']

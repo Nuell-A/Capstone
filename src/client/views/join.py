@@ -7,9 +7,7 @@ class JoinView(BaseView):
     def __init__(self, screen, manager, screen_size: tuple, dt, network_handler: object, player):
         super().__init__(screen, manager, screen_size, dt)
         self.network_handler = network_handler
-        self.game_id = None
         self.player = player
-        print("Waiting for game ID.")
 
     def createUI(self):
         self.join_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 35), (150, 100)),
@@ -42,9 +40,8 @@ class JoinView(BaseView):
             
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.submit_bt:
-                    game_id = self.gameID_entry.get_text()
-                    self.player.setGameID(game_id)
-                    self.game_id = self.player.getGameID()
+                    self.game_id = self.gameID_entry.get_text()
+                    self.player.setGameID(self.game_id)
                     name = self.player.getName()
                     request = {'type': 'join_request', 'data': [{'game_id': self.game_id, 'name': name}]}
                     self.network_handler.sendRequest(request)
@@ -82,6 +79,7 @@ class JoinView(BaseView):
             
             if self.scene == "lobby":
                 self.killUI()
+                print(self.player)
                 return "lobby"
             
             self.update()
