@@ -1,5 +1,7 @@
 import pygame
 import pygame_gui
+from pygame_gui.core import ObjectID
+import os
 from .base_view import BaseView
 
 
@@ -16,7 +18,7 @@ class MenuView(BaseView):
         """Creating and position UI elements. Rects are used for positioning relative to
         other elements. """
         # Buttons
-        host_rect = pygame.Rect((0, 200), (100, 50))
+        host_rect = pygame.Rect((0, 150), (100, 50))
         join_rect = pygame.Rect((0, 20), (100, 50))
         '''Anchor targets are of the element being placed not the element you're placing next to.
         e.g. in join_bt the top_target is the the top of join_bt to host_bt'''
@@ -31,13 +33,15 @@ class MenuView(BaseView):
                                                     container=None,
                                                     anchors={'centerx': 'centerx',
                                                              'top_target': self.host_bt})
-        # TextBox
-        self.title_label = pygame_gui.elements.UITextBox(relative_rect=pygame.Rect((0, 50), (150, 100)),
-                                                         html_text='<effect id=title>GAME TITLE</effect>',
-                                                         manager=self.manager,
-                                                         container=None,
-                                                         anchors={'centerx': 'centerx'})
-        self.title_label.set_active_effect(pygame_gui.TEXT_EFFECT_BOUNCE, effect_tag='title')
+        # Get the current directory
+        current_dir = os.path.dirname(__file__)
+        assets_dir = os.path.abspath(os.path.join(current_dir, '..', 'assets'))
+        image_path = os.path.join(assets_dir, 'title.png')
+        image_surface = pygame.image.load(image_path)
+        self.title_img = pygame_gui.elements.UIImage(relative_rect=pygame.Rect((0, 50), (300, 100)),
+                                                     image_surface=image_surface,
+                                                     manager=self.manager,
+                                                     anchors={'centerx': 'centerx'})
         # TextBoxEntry
         self.username_text = pygame_gui.elements.UITextEntryBox(relative_rect=pygame.Rect((0, 80), (250, 50)),
                                                                 initial_text="",
@@ -45,7 +49,7 @@ class MenuView(BaseView):
                                                                 container=None,
                                                                 anchors={'centerx': 'centerx',
                                                                          'top_target': self.join_bt})
-        self.username_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 350), (150, 50)),
+        self.username_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((0, 300), (150, 50)),
                                                           text="Please input name:",
                                                           manager=self.manager,
                                                           container=None,
@@ -54,7 +58,7 @@ class MenuView(BaseView):
     def killUI(self):
         self.host_bt.kill()
         self.join_bt.kill()
-        self.title_label.kill()
+        self.title_img.kill()
         self.username_text.kill()
         self.username_label.kill()
 

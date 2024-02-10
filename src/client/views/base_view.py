@@ -15,7 +15,7 @@ class BaseView:
 
     def draw(self):
         background = pygame.Surface(self.screen_size)
-        background.fill(pygame.Color('#a575c6'))
+        background.fill(pygame.Color(255, 175, 204))
 
         # Blit to add background (Surface) to screen
         self.screen.blit(background, (0, 0))

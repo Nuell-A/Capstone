@@ -31,6 +31,15 @@ class QuizView(BaseView):
                                                   container=None,
                                                   anchors={'centerx': 'centerx'}
                                                   )
+        
+        self.score_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1200, 20), (75, 50)),
+                                                       text=str(self.score),
+                                                       manager=self.manager,
+                                                       container=None)
+        self.score_text = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((1150, 20), (75, 50)),
+                                                       text="SCORE: ",
+                                                       manager=self.manager,
+                                                       container=None)
         # Question box
         self.question_textbox = pygame_gui.elements.UILabel(text="Default Text", 
                                                          relative_rect=pygame.Rect((0, 50), (300, 100),),
@@ -57,18 +66,11 @@ class QuizView(BaseView):
                                                          )
             
             self.answers[button_id] = self.answer_choice
-            
-        # Live score bar
-        self.score_bar = pygame_gui.elements.UIProgressBar(relative_rect=pygame.Rect((0, 50), (1200, 50)),
-                                                      manager=self.manager,
-                                                      container=None,
-                                                      anchors={'centerx': 'centerx', 'top_target': self.answerchoice_panel})
         
     def killUI(self):
         self.timer_label.kill()
         self.question_textbox.kill()
         self.answerchoice_panel.kill()
-        self.score_bar.kill()
 
         for answer_id, answer in self.answers.items():
             answer.kill()
@@ -87,6 +89,34 @@ class QuizView(BaseView):
         # Checks if timer is done
         if remaining_time <= 0:
             self.timerDone()
+
+    def timerDone(self):
+        '''Resets timer, moves to next question in the set.'''
+        self.checkAnswer()
+        # Resets answer selection for new question/answer combo
+        self.selected_answer = None
+        self.resetTimer()
+        self.updateAnswers()
+        self.updateQuestion()
+        self.updateScore()
+        
+    def checkAnswer(self):
+        '''Sends last selected asnwer to server and checks if it's correct or not.'''
+        if self.selected_answer:
+            selected_answer = list(self.selected_answer)
+            print(selected_answer[0])
+            print(self.game_id)
+            request = {'type': 'check_answer', 'selected_answer': selected_answer[0], 'game_id': self.game_id}
+            print("Sending answer to server.")
+            self.network_handler.sendRequest(request)
+            time.sleep(.2)
+        else:
+            selected_answer = self.selected_answer
+            print(self.game_id)
+            request = {'type': 'check_answer', 'selected_answer': selected_answer, 'game_id': self.game_id}
+            print("Sending answer to server. NONE")
+            self.network_handler.sendRequest(request)
+            time.sleep(.2)
 
     def resetTimer(self):
         self.timer_duration = self.ROUND_TIME
@@ -121,32 +151,22 @@ class QuizView(BaseView):
                 self.scene = "results"
                 return "results"
             print(f"Active scene: {self.scene}")
-            
-    def timerDone(self):
-        '''Resets timer, moves to next question in the set.'''
-        self.checkAnswer()
-        # Resets answer selection for new question/answer combo
-        self.selected_answer = None
-        self.resetTimer()
-        self.updateAnswers()
-        self.updateQuestion()
-        
 
+    def updateScore(self):
+        self.score_label.set_text(str(self.score[0]['score']))
+            
     def handleEvents(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 print("quitting")
                 self.scene = "quit"
                 return "quit"
-            
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 for button_id, button in self.answers.items():
                     if event.ui_element == button:
                         print(f"{button_id} selected: {button.text}")
-                        self.selected_answer = {button.text}
-                    
+                        self.selected_answer = {button.text}    
             self.manager.process_events(event)
-        
         return True
 
     def handleResponse(self, response):
@@ -158,34 +178,13 @@ class QuizView(BaseView):
                     'question_text': question[2],
                     'correct_answer': question[3],
                 }
-
                 self.question_dicts.append(question_dict)
-            
             self.wrong_answers = response['data'][0]['wrong_answers']
         
         elif response['type'] == 'check_answer_response':
-            score = response['data'][0]['score']
-            self.player.setScore(score)
+            self.score = response['data'][0]['score']
+            self.player.setScore(self.score)
             print(f"Current score: {self.player}")
-
-
-    def checkAnswer(self):
-        '''Sends last selected asnwer to server and checks if it's correct or not.'''
-        if self.selected_answer:
-            selected_answer = list(self.selected_answer)
-            print(selected_answer[0])
-            print(self.game_id)
-            request = {'type': 'check_answer', 'selected_answer': selected_answer[0], 'game_id': self.game_id}
-            print("Sending answer to server.")
-            self.network_handler.sendRequest(request)
-            time.sleep(.2)
-        else:
-            selected_answer = self.selected_answer
-            print(self.game_id)
-            request = {'type': 'check_answer', 'selected_answer': selected_answer, 'game_id': self.game_id}
-            print("Sending answer to server. NONE")
-            self.network_handler.sendRequest(request)
-            time.sleep(.2)
 
     def getQuestionSet(self):
         "Requests uniqueID from server"

@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 import logging
+import os
 from network_client import NetworkClient
 from player import Player
 
@@ -25,7 +26,11 @@ def gameLoop():
     pygame.init()
     screen = pygame.display.set_mode(screen_size)
     pygame.display.set_caption("Menu")
-    manager = pygame_gui.UIManager(screen_size)
+
+    current_dir = os.path.dirname(__file__)
+    assets_dir = os.path.abspath(os.path.join(current_dir, '..', 'assets'))
+    theme_path = os.path.join(assets_dir, 'theme.json')
+    manager = pygame_gui.UIManager(screen_size, theme_path)
 
     network_handler = None
     try:
