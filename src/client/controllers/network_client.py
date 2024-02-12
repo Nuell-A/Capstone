@@ -22,12 +22,14 @@ class NetworkClient:
         "Connects to server"
         try:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.connect(("172.30.21.2", self.port))
+
+            self.s.connect((self.host, self.port))
             handler = threading.Thread(target=self.handleResponse,)
             handler.start()
             print("Successfully connected to server... ready to handle send/receives.")
         except:
             print("There was an error connecting")
+            logging.error("COULDN'T CONNECT TO SERVER.", exc_info=True)
 
     def sendRequest(self, request):
         request_dump = json.dumps(request)

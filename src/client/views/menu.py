@@ -36,7 +36,7 @@ class MenuView(BaseView):
         # Get the current directory
         current_dir = os.path.dirname(__file__)
         assets_dir = os.path.abspath(os.path.join(current_dir, '..', 'assets'))
-        image_path = os.path.join(assets_dir, 'title.png')
+        image_path = os.path.join(assets_dir, 'title2.png')
         image_surface = pygame.image.load(image_path)
         self.title_img = pygame_gui.elements.UIImage(relative_rect=pygame.Rect((0, 50), (300, 100)),
                                                      image_surface=image_surface,

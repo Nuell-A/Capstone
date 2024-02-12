@@ -2,6 +2,7 @@ import socket
 import threading
 import json
 import logging
+import ssl
 
 import sys
 sys.path.insert(1, "/Users/emanuelalcala/Desktop/Projects/Project/Capstone/src")
@@ -21,12 +22,11 @@ class ServerController:
         self.question_sets = {}
         self.wrong_answers = []
         self.players = {}
-        self.main()
 
     def sendResponse(self, conn, response):
         response_json = json.dumps(response)
         conn.sendall(response_json.encode('utf-8'))
-        print("Sent RESPONSE.")
+        print("Sent RESPONSE.\n\n")
 
     def sendToSession(self, game_id, update):
         '''Sends an update (response, request, etc.) to clients in a game session.'''
@@ -69,10 +69,9 @@ class ServerController:
         self.active_sessions[game_id] = [{'conn': conn, 'addr': addr}]
         self.players[conn] = [{'name': name, 'score': 0}]
         # Info for server.
-        print(f"PLAYER {name} is now hosting a session.\nCURRENT PLAYERS: {self.players}")
+        print(f"PLAYER {name} is now hosting a session.")
         print("---------------------------------------------")
-        print(f"ACTIVE SESSIONS: {self.active_sessions}")
-        print("---------------------------------------------\n")
+        print(f"ACTIVE SESSIONS: {self.active_sessions}\n")
         self.sendResponse(conn, response)
 
     def handleQuestionSetRequest(self, request, conn):
@@ -96,29 +95,27 @@ class ServerController:
             response = {'type': 'join_response', 'status': 'Error', 'message': 'Game ID not provided.'}
             self.sendResponse(conn, response)
 
-    def handleChatRequest(self, request, conn):
-        print("Hello from chat func.")
-        game_id = request.get('game_id')
-        message = request.get('message')
-        print(f"{game_id} and {message}")
-        client_name = self.players[conn][0]['name']
-        update = {'type': 'chat_response', 'data': [{'name': client_name, 'message': message}]}
-        self.sendToSession(game_id, update)
-
     def joinSession(self, game_id, name, conn, addr):
         if game_id in self.active_sessions:
             player_info = {'conn': conn, 'addr': addr}
             self.active_sessions[game_id].append(player_info)
             self.players[conn] = [{'name': name, 'score': 0}]
             print("---------------------------------------------")
-            print(f"Client {addr} joined AS.\nCurrent players: {self.players}\nCurrent active session: {self.active_sessions}")
-            print("---------------------------------------------\n")
+            print(f"Client {addr} joined AS.\nCurrent players: {self.players}")
             response = {'type': 'join_response', 'status': 'Success', 'message': 'Joined session.'}
             self.sendResponse(conn, response)
         else:
             print("Didn't join session.\n")
             response = {'type':'join_response', 'status': 'Error', 'message': 'Check game ID and try again.'}
             self.sendResponse(conn, response)
+    
+    def handleChatRequest(self, request, conn):
+        game_id = request.get('game_id')
+        message = request.get('message')
+        print(f"{game_id} and {message}")
+        client_name = self.players[conn][0]['name']
+        update = {'type': 'chat_response', 'data': [{'name': client_name, 'message': message}]}
+        self.sendToSession(game_id, update)
     
     def handleStartRequest(self, request):
         print(f"Recieved update request: {request}\n")
@@ -197,13 +194,11 @@ class ServerController:
         print("Starting socket...")
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # IPV4 and TCP
         try:
-            s.bind(("172.30.21.2", config.socket_port))
+            s.bind((config.socket_host, config.socket_port))
             s.listen()
-            print("Socket binded successfully.")
-            # Once accept is called it blocks script execution, hence why threading is needed.
             
             print("Ready to accept clients:")
-            while True:
+            while True: # Once accept is called it blocks script execution, hence why threading is needed.
                 conn, addr = s.accept() # conn = new socket object, addr = client address 
                 print(f"Client connected: {addr}")
 
@@ -215,3 +210,4 @@ class ServerController:
 
 if __name__=="__main__":
     sc = ServerController()
+    sc.main()
